@@ -1,6 +1,12 @@
-import { Component, ElementType, ErrorInfo } from "react";
+import {
+  Component,
+  ComponentType,
+  ErrorInfo,
+  FunctionComponent,
+  isValidElement,
+  ReactElement,
+} from "react";
 import { BugSplatLogger, Logger } from "../bugsplat-logger";
-import BasicFallback from "./BasicFallback";
 import { isArrayChanged } from "./util";
 
 const DEFAULT_LOGGER = new BugSplatLogger();
@@ -10,6 +16,36 @@ export interface FallbackProps {
   error?: Error;
   resetErrorBoundary?: (...args: unknown[]) => void;
 }
+
+export type FallbackElement = ReactElement<
+  unknown,
+  string | FunctionComponent | typeof Component
+> | null;
+export type FallbackComponent = ComponentType<FallbackProps>;
+export type FallbackRender = (props: FallbackProps) => FallbackElement;
+
+/**
+ * Provide a fallback to render when ErrorBoundary catches an error.
+ *
+ * This can be a component, a function that renders an element
+ * or a rendered element from the parent scope.
+ */
+export type FallbackVariantProps =
+  | {
+      fallback: FallbackElement;
+      FallbackComponent?: never;
+      renderFallback?: never;
+    }
+  | {
+      fallback?: never;
+      FallbackComponent: FallbackComponent;
+      renderFallback?: never;
+    }
+  | {
+      fallback?: never;
+      FallbackComponent?: never;
+      renderFallback: FallbackRender;
+    };
 
 export interface ErrorBoundaryProps {
   /**
@@ -48,10 +84,6 @@ export interface ErrorBoundaryProps {
    */
   resetKeys?: unknown[];
   /**
-   * Fallback component to render when ErrorBoundary catches an error.
-   */
-  Fallback?: ElementType<FallbackProps>;
-  /**
    * Pass a custom logger object
    */
   logger?: Logger;
@@ -66,7 +98,7 @@ export interface ErrorBoundaryState {
 }
 
 export class ErrorBoundary extends Component<
-  ErrorBoundaryProps,
+  ErrorBoundaryProps & FallbackVariantProps,
   ErrorBoundaryState
 > {
   static getDerivedStateFromError(error: Error) {
@@ -119,12 +151,24 @@ export class ErrorBoundary extends Component<
 
   render() {
     const { error } = this.state;
-    const { Fallback = BasicFallback } = this.props;
+    const { fallback, renderFallback, FallbackComponent } = this.props;
 
     if (error !== null) {
-      return (
-        <Fallback error={error} resetErrorBoundary={this.resetErrorBoundary} />
-      );
+      const fallbackProps = {
+        error,
+        resetErrorBoundary: this.resetErrorBoundary,
+      };
+      if (isValidElement(fallback)) {
+        return fallback;
+      } else if (typeof renderFallback === "function") {
+        return renderFallback(fallbackProps);
+      } else if (FallbackComponent) {
+        return <FallbackComponent {...fallbackProps} />;
+      } else {
+        throw new Error(
+          "ErrorBoundary requires either a fallback, renderFallback, or FallbackComponent prop."
+        );
+      }
     }
 
     return this.props.children;
