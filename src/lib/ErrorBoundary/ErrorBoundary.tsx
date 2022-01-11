@@ -1,6 +1,5 @@
 import {
   Component,
-  ComponentType,
   ErrorInfo,
   FunctionComponent,
   isValidElement,
@@ -21,31 +20,7 @@ export type FallbackElement = ReactElement<
   unknown,
   string | FunctionComponent | typeof Component
 > | null;
-export type FallbackComponent = ComponentType<FallbackProps>;
 export type FallbackRender = (props: FallbackProps) => FallbackElement;
-
-/**
- * Provide a fallback to render when ErrorBoundary catches an error.
- *
- * This can be a component, a function that renders an element
- * or a rendered element from the parent scope.
- */
-export type FallbackVariantProps =
-  | {
-      fallback: FallbackElement;
-      FallbackComponent?: never;
-      renderFallback?: never;
-    }
-  | {
-      fallback?: never;
-      FallbackComponent: FallbackComponent;
-      renderFallback?: never;
-    }
-  | {
-      fallback?: never;
-      FallbackComponent?: never;
-      renderFallback: FallbackRender;
-    };
 
 export interface ErrorBoundaryProps {
   /**
@@ -84,6 +59,12 @@ export interface ErrorBoundaryProps {
    */
   resetKeys?: unknown[];
   /**
+   * Provide a fallback to render when ErrorBoundary catches an error.
+   *
+   * This can be an element or a function that renders an element.
+   */
+  fallback?: FallbackElement | FallbackRender;
+  /**
    * Pass a custom logger object
    */
   logger?: Logger;
@@ -98,7 +79,7 @@ export interface ErrorBoundaryState {
 }
 
 export class ErrorBoundary extends Component<
-  ErrorBoundaryProps & FallbackVariantProps,
+  ErrorBoundaryProps,
   ErrorBoundaryState
 > {
   static getDerivedStateFromError(error: Error) {
@@ -151,27 +132,19 @@ export class ErrorBoundary extends Component<
 
   render() {
     const { error } = this.state;
-    const { fallback, renderFallback, FallbackComponent } = this.props;
+    const { fallback, children } = this.props;
 
     if (error !== null) {
-      const fallbackProps = {
-        error,
-        resetErrorBoundary: this.resetErrorBoundary,
-      };
       if (isValidElement(fallback)) {
         return fallback;
-      } else if (typeof renderFallback === "function") {
-        return renderFallback(fallbackProps);
-      } else if (FallbackComponent) {
-        return <FallbackComponent {...fallbackProps} />;
+      } else if (typeof fallback === "function") {
+        return fallback({ error, resetErrorBoundary: this.resetErrorBoundary });
       } else {
-        throw new Error(
-          "ErrorBoundary requires either a fallback, renderFallback, or FallbackComponent prop."
-        );
+        return null;
       }
     }
 
-    return this.props.children;
+    return children;
   }
 }
 
