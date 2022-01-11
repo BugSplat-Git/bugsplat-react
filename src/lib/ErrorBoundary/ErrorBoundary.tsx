@@ -23,7 +23,7 @@ export interface ErrorBoundaryProps {
   /**
    * Callback called on componentWillUnmount()
    */
-  onUnmount?: () => void;
+  onUnmount?: (error: Error | null) => void;
   /**
    * Callback called before ErrorBoundary resets internal state,
    * resulting in rendering children again. This should be
@@ -56,9 +56,9 @@ export interface ErrorBoundaryProps {
    */
   logger?: Logger;
   /**
-   * Hook to change request before it is sent to bugsplat
+   * Callback called before captured error is sent to BugSplat
    */
-  beforeCapture?: () => void;
+  beforeCapture?: (error: Error | null, info: ErrorInfo | null) => void;
 }
 
 export interface ErrorBoundaryState {
@@ -114,7 +114,7 @@ export class ErrorBoundary extends Component<
   }
 
   componentWillUnmount() {
-    this.props.onUnmount?.();
+    this.props.onUnmount?.(this.state.error);
   }
 
   render() {
