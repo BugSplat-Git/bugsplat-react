@@ -4,29 +4,66 @@ import BasicFallback from "./BasicFallback";
 import { isArrayChanged } from "./util";
 
 const DEFAULT_LOGGER = new BugSplatLogger();
+const INITIAL_STATE: ErrorBoundaryState = { error: null };
 
-export interface ErrorBoundaryFallbackProps {
+export interface FallbackProps {
   error?: Error;
   resetErrorBoundary?: (...args: unknown[]) => void;
 }
 
 export interface ErrorBoundaryProps {
+  /**
+   * Callback called when ErrorBoundary catches an error in componentDidCatch()
+   */
   onError?: (error: Error, info: ErrorInfo) => void;
+  /**
+   * Callback called on componentDidMount()
+   */
+  onMount?: () => void;
+  /**
+   * Callback called on componentWillUnmount()
+   */
+  onUnmount?: () => void;
+  /**
+   * Callback called before ErrorBoundary resets internal state,
+   * resulting in rendering children again. This should be
+   * used to ensure that rerendering of children would not
+   * repeat the same error that occurred.
+   *
+   * *Not called when reset from change in resetKeys.
+   * Use onResetKeysChange for that.*
+   */
   onReset?: (...args: unknown[]) => void;
+  /**
+   * Callback called when keys passed to resetKeys are changed
+   */
   onResetKeysChange?: (
     prevResetKeys?: unknown[],
     resetKeys?: unknown[]
   ) => void;
+  /**
+   * Array of values passed from parent scope. When ErrorBoundary
+   * is in an error state, it will check each passed value
+   * and automatically reset if any of the values have changed.
+   */
   resetKeys?: unknown[];
-  Fallback?: ElementType<ErrorBoundaryFallbackProps>;
+  /**
+   * Fallback component to render when ErrorBoundary catches an error.
+   */
+  Fallback?: ElementType<FallbackProps>;
+  /**
+   * Pass a custom logger object
+   */
   logger?: Logger;
+  /**
+   * Hook to change request before it is sent to bugsplat
+   */
+  beforeCapture?: () => void;
 }
 
 export interface ErrorBoundaryState {
   error: Error | null;
 }
-
-const initialState: ErrorBoundaryState = { error: null };
 
 export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
@@ -38,10 +75,9 @@ export class ErrorBoundary extends Component<
 
   static defaultProps = {
     logger: DEFAULT_LOGGER,
-    Fallback: BasicFallback,
   };
 
-  state = initialState;
+  state = INITIAL_STATE;
 
   resetErrorBoundary = (...args: unknown[]) => {
     this.props.onReset?.(...args);
@@ -49,7 +85,7 @@ export class ErrorBoundary extends Component<
   };
 
   reset() {
-    this.setState(initialState);
+    this.setState(INITIAL_STATE);
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -73,11 +109,12 @@ export class ErrorBoundary extends Component<
     }
   }
 
-  /**
-   * Hook to change request before it is sent to bugsplat
-   */
-  beforeCapture() {
-    throw new Error("Not Implemented");
+  componentDidMount() {
+    this.props.onMount?.();
+  }
+
+  componentWillUnmount() {
+    this.props.onUnmount?.();
   }
 
   render() {
