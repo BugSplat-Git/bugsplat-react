@@ -12,8 +12,8 @@ const DEFAULT_LOGGER = new BugSplatLogger();
 const INITIAL_STATE: ErrorBoundaryState = { error: null };
 
 export interface FallbackProps {
-  error?: Error;
-  resetErrorBoundary?: (...args: unknown[]) => void;
+  error: Error;
+  resetErrorBoundary: (...args: unknown[]) => void;
 }
 
 export type FallbackElement = ReactElement<
