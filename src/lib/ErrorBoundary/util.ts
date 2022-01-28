@@ -1,5 +1,6 @@
 /**
- * Determine if an array
+ * Determine if any items in an array have changed.
+ * Uses Object.is to perform comparison on each item.
  * @param a
  * @param b
  * @returns

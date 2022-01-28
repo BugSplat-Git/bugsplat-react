@@ -1,11 +1,14 @@
+import { BugSplat } from "bugsplat";
 import {
   Component,
+  ContextType,
   ErrorInfo,
   FunctionComponent,
   isValidElement,
   ReactElement,
 } from "react";
 import { BugSplatLogger, Logger } from "../bugsplat-logger";
+import { BugSplatContext } from "../context";
 import { isArrayChanged } from "./util";
 
 const DEFAULT_LOGGER = new BugSplatLogger();
@@ -24,15 +27,19 @@ export type FallbackRender = (props: FallbackProps) => FallbackElement;
 
 export interface ErrorBoundaryProps {
   /**
+   * BugSplat instance used to post errors.
+   */
+  bugSplat?: BugSplat;
+  /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
    */
   onError?: (error: Error, info: ErrorInfo) => void;
   /**
-   * Callback called on componentDidMount()
+   * Callback called on componentDidMount().
    */
   onMount?: () => void;
   /**
-   * Callback called on componentWillUnmount()
+   * Callback called on componentWillUnmount().
    */
   onUnmount?: (error: Error | null) => void;
   /**
@@ -41,12 +48,12 @@ export interface ErrorBoundaryProps {
    * used to ensure that rerendering of children would not
    * repeat the same error that occurred.
    *
-   * *Not called when reset from change in resetKeys.
-   * Use onResetKeysChange for that.*
+   * *Not called when reset from change in resetKeys -
+   * use onResetKeysChange for that.*
    */
   onReset?: (...args: unknown[]) => void;
   /**
-   * Callback called when keys passed to resetKeys are changed
+   * Callback called when keys passed to resetKeys are changed.
    */
   onResetKeysChange?: (
     prevResetKeys?: unknown[],
@@ -65,13 +72,13 @@ export interface ErrorBoundaryProps {
    */
   fallback?: FallbackElement | FallbackRender;
   /**
-   * Pass a custom logger object
+   * Pass a custom logger object.
    */
   logger?: Logger;
   /**
-   * Callback called before captured error is sent to BugSplat
+   * Callback called before error post to BugSplat.
    */
-  beforeCapture?: (error: Error | null, info: ErrorInfo | null) => void;
+  beforePost?: (error: Error | null, info: ErrorInfo | null) => void;
 }
 
 export interface ErrorBoundaryState {
@@ -90,7 +97,27 @@ export class ErrorBoundary extends Component<
     logger: DEFAULT_LOGGER,
   };
 
+  static contextType = BugSplatContext;
+
+  declare context: ContextType<typeof BugSplatContext>;
+
   state = INITIAL_STATE;
+
+  async tryPost(error: Error, errorInfo: ErrorInfo) {
+    const bugSplat = this.props.bugSplat || this.context;
+    if (bugSplat) {
+      return await bugSplat.post(error, {
+        additionalFormDataParams: [
+          {
+            key: "componentStack",
+            value: errorInfo.componentStack,
+          },
+        ],
+      });
+    }
+
+    return null;
+  }
 
   resetErrorBoundary = (...args: unknown[]) => {
     this.props.onReset?.(...args);
@@ -102,7 +129,17 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.props.onError?.(error, errorInfo);
+    const { onError, beforePost } = this.props;
+
+    if (beforePost) {
+      beforePost(error, errorInfo);
+    }
+
+    this.tryPost(error, errorInfo);
+
+    if (onError) {
+      onError(error, errorInfo);
+    }
   }
 
   componentDidUpdate(
@@ -134,7 +171,7 @@ export class ErrorBoundary extends Component<
     const { error } = this.state;
     const { fallback, children } = this.props;
 
-    if (error !== null) {
+    if (error) {
       if (isValidElement(fallback)) {
         return fallback;
       } else if (typeof fallback === "function") {
