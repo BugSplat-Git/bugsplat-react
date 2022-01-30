@@ -9,10 +9,19 @@ import {
 } from "react";
 import { BugSplatLogger, Logger } from "../bugsplat-logger";
 import { BugSplatContext } from "../context";
-import { isArrayDiff } from "./util";
 
 const DEFAULT_LOGGER = new BugSplatLogger();
 const INITIAL_STATE: ErrorBoundaryState = { error: null };
+
+/**
+ * Shallowly compare two arrays to determine if they are different.
+ * Uses `Object.is` to perform comparison on each item.
+ */
+function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
+  return (
+    a.length !== b.length || a.some((item, index) => !Object.is(item, b[index]))
+  );
+}
 
 export interface FallbackProps {
   error: Error;
