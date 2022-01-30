@@ -21,18 +21,22 @@ export class BugSplatLogger implements Logger {
   static readonly LEVEL_CANNOT_BE_NULL =
     "BugSplatLogger Error: level cannot be null!";
   static readonly LOGGER_CANNOT_BE_NULL =
-    "BugSplatLogger Error: level cannot be null!";
+    "BugSplatLogger Error: logger cannot be null!";
 
   constructor(
     private level: BugSplatLogLevel = BugSplatLogLevel.Error,
     private logger: Logger = DEFAULT_LOGGER
   ) {
-    if (this.level === null) {
-      throw new Error(BugSplatLogger.LEVEL_CANNOT_BE_NULL);
+    if (level === null) {
+      if (process.env.NODE_ENV !== "production") {
+        throw new Error(BugSplatLogger.LEVEL_CANNOT_BE_NULL);
+      }
     }
 
-    if (this.logger === null) {
-      throw new Error(BugSplatLogger.LOGGER_CANNOT_BE_NULL);
+    if (logger === null) {
+      if (process.env.NODE_ENV !== "production") {
+        throw new Error(BugSplatLogger.LOGGER_CANNOT_BE_NULL);
+      }
     }
   }
 

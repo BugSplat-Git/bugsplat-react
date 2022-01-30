@@ -9,7 +9,7 @@ import {
 } from "react";
 import { BugSplatLogger, Logger } from "../bugsplat-logger";
 import { BugSplatContext } from "../context";
-import { isArrayChanged } from "./util";
+import { isArrayDiff } from "./util";
 
 const DEFAULT_LOGGER = new BugSplatLogger();
 const INITIAL_STATE: ErrorBoundaryState = { error: null };
@@ -109,22 +109,6 @@ export class ErrorBoundary extends Component<
 
   state = INITIAL_STATE;
 
-  async tryPost(error: Error, errorInfo: ErrorInfo) {
-    const bugSplat = this.props.bugSplat || this.context;
-    if (!bugSplat) {
-      return null;
-    }
-
-    return bugSplat.post(error, {
-      additionalFormDataParams: [
-        {
-          key: "componentStack",
-          value: errorInfo.componentStack,
-        },
-      ],
-    });
-  }
-
   resetErrorBoundary = (...args: unknown[]) => {
     this.props.onReset?.(...args);
     this.reset();
@@ -136,12 +120,22 @@ export class ErrorBoundary extends Component<
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const { onError, beforePost } = this.props;
+    const bugSplat = this.props.bugSplat || this.context;
 
-    if (beforePost) {
-      beforePost(error, errorInfo);
+    if (bugSplat) {
+      if (beforePost) {
+        beforePost(error, errorInfo);
+      }
+
+      bugSplat.post(error, {
+        additionalFormDataParams: [
+          {
+            key: "componentStack",
+            value: errorInfo.componentStack,
+          },
+        ],
+      });
     }
-
-    this.tryPost(error, errorInfo);
 
     if (onError) {
       onError(error, errorInfo);
@@ -158,7 +152,7 @@ export class ErrorBoundary extends Component<
     if (
       error !== null &&
       prevState.error !== null &&
-      isArrayChanged(prevProps.resetKeys, resetKeys)
+      isArrayDiff(prevProps.resetKeys, resetKeys)
     ) {
       this.props.onResetKeysChange?.(prevProps.resetKeys, resetKeys);
       this.reset();

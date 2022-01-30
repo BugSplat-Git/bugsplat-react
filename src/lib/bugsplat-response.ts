@@ -43,6 +43,7 @@ export function parseResponseData({
     };
   }
   return {
+    ...defaultResponseData,
     success: response.status === "success",
   };
 }

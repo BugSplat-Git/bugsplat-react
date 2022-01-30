@@ -82,7 +82,7 @@ describe("<ErrorBoundary />", () => {
     });
   });
 
-  it("should reset the error boundary when resetKeys change", () => {
+  it("should reset when resetKeys change", () => {
     const handleResetKeysChange = jest.fn();
     const handleReset = jest.fn<void, unknown[]>();
     const TRY_AGAIN_ARGS = ["TRY_AGAIN_ARG1", "TRY_AGAIN_ARG2"];
