@@ -1,5 +1,5 @@
 import { BugSplat } from "bugsplat";
-import { createContext, useContext } from "react";
+import { ComponentType, createContext, useContext } from "react";
 import { ReactNode } from "react";
 
 export const BugSplatContext = createContext<BugSplat | null>(null);
@@ -42,4 +42,23 @@ export function useBugSplat(): BugSplat {
   }
 
   return bugSplatContext;
+}
+
+/**
+ * Higher order component to inject BugSplat instance
+ * into component props from context.
+ */
+export function withBugSplat<P extends { bugSplat?: BugSplat }>(
+  Component: ComponentType<P>
+) {
+  const WithBugSplat: ComponentType<P> = (props) => {
+    const bugSplat = useBugSplat();
+
+    return <Component bugSplat={bugSplat} {...props} />;
+  };
+  const componentDisplayName =
+    Component.displayName || Component.name || "Component";
+  WithBugSplat.displayName = `WithBugSplat(${componentDisplayName})`;
+
+  return WithBugSplat;
 }

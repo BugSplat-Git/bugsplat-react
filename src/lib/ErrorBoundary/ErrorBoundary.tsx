@@ -85,6 +85,12 @@ export interface ErrorBoundaryState {
   error: Error | null;
 }
 
+/**
+ * Handle errors that occur during rendering by wrapping
+ * your component tree with ErrorBoundary. Any number of ErrorBoundary
+ * components can be rendered in the tree and any rendering error will
+ * propagate to the nearest one.
+ */
 export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
@@ -105,18 +111,18 @@ export class ErrorBoundary extends Component<
 
   async tryPost(error: Error, errorInfo: ErrorInfo) {
     const bugSplat = this.props.bugSplat || this.context;
-    if (bugSplat) {
-      return await bugSplat.post(error, {
-        additionalFormDataParams: [
-          {
-            key: "componentStack",
-            value: errorInfo.componentStack,
-          },
-        ],
-      });
+    if (!bugSplat) {
+      return null;
     }
 
-    return null;
+    return bugSplat.post(error, {
+      additionalFormDataParams: [
+        {
+          key: "componentStack",
+          value: errorInfo.componentStack,
+        },
+      ],
+    });
   }
 
   resetErrorBoundary = (...args: unknown[]) => {
