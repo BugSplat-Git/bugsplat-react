@@ -7,7 +7,7 @@ import {
   isValidElement,
   ReactElement,
 } from "react";
-import { BugSplatLogger, Logger } from "../bugsplat-logger";
+import { BugSplatLogger } from "../bugsplat-logger";
 import { BugSplatContext } from "../context";
 
 const DEFAULT_LOGGER = new BugSplatLogger();
@@ -39,6 +39,10 @@ export interface ErrorBoundaryProps {
    * BugSplat instance used to post errors.
    */
   bugSplat?: BugSplat;
+  /**
+   * Callback called before error post to BugSplat.
+   */
+  beforePost?: (error: Error | null, info: ErrorInfo | null) => void;
   /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
    */
@@ -80,14 +84,6 @@ export interface ErrorBoundaryProps {
    * This can be an element or a function that renders an element.
    */
   fallback?: FallbackElement | FallbackRender;
-  /**
-   * Pass a custom logger object.
-   */
-  logger?: Logger;
-  /**
-   * Callback called before error post to BugSplat.
-   */
-  beforePost?: (error: Error | null, info: ErrorInfo | null) => void;
 }
 
 export interface ErrorBoundaryState {
