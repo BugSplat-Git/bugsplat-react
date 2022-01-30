@@ -50,7 +50,7 @@ export function useBugSplat(): BugSplat {
  */
 export function withBugSplat<P extends { bugSplat?: BugSplat }>(
   Component: ComponentType<P>
-) {
+): ComponentType<P> {
   const WithBugSplat: ComponentType<P> = (props) => {
     const bugSplat = useBugSplat();
 

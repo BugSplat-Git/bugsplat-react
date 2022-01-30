@@ -7,8 +7,8 @@ import ErrorBoundary, { ErrorBoundaryProps } from "./ErrorBoundary";
 export default function withErrorBoundary<P extends Record<string, unknown>>(
   Component: ComponentType<P>,
   errorBoundaryProps: ErrorBoundaryProps
-) {
-  const WrappedComponent = (props: P) => (
+): ComponentType<P> {
+  const WrappedComponent: ComponentType<P> = (props) => (
     <ErrorBoundary {...errorBoundaryProps}>
       <Component {...props} />
     </ErrorBoundary>
