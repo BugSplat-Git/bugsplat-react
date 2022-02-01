@@ -7,8 +7,8 @@ import {
   isValidElement,
   ReactElement,
 } from "react";
-import { BugSplatLogger } from "../bugsplat-logger";
-import { BugSplatContext } from "../context";
+import { BugSplatLogger } from "./bugsplat-logger";
+import { BugSplatContext } from "./context";
 
 const DEFAULT_LOGGER = new BugSplatLogger();
 const INITIAL_STATE: ErrorBoundaryState = { error: null };

@@ -2,7 +2,7 @@ import { fireEvent, render } from "@testing-library/react";
 import { useState } from "react";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { BugSplat } from "bugsplat";
-import { BugSplatProvider } from "../context";
+import { BugSplatProvider } from "./context";
 
 const mockPost = jest.fn();
 jest.mock("bugsplat", () => ({
@@ -92,6 +92,7 @@ describe("<ErrorBoundary />", () => {
         expect(mockBeforePost).toHaveBeenCalledTimes(1);
       });
     });
+
     describe("when child of BugSplatProvider", () => {
       const bugSplat = new BugSplat("test-db", "test", "1.33.7");
       it("should call BugSplat.post", () => {
