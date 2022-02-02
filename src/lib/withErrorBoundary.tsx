@@ -4,9 +4,9 @@ import ErrorBoundary, { ErrorBoundaryProps } from "./ErrorBoundary";
 /**
  * Higher order component to wrap your component tree with ErrorBoundary
  */
-export default function withErrorBoundary<P extends Record<string, unknown>>(
+ export default function withErrorBoundary<P extends Record<string, unknown>>(
   Component: ComponentType<P>,
-  errorBoundaryProps: ErrorBoundaryProps
+  errorBoundaryProps: ErrorBoundaryProps = {}
 ): ComponentType<P> {
   const WrappedComponent: ComponentType<P> = (props) => (
     <ErrorBoundary {...errorBoundaryProps}>

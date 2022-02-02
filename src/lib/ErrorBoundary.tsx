@@ -7,7 +7,7 @@ import {
   isValidElement,
   ReactElement,
 } from "react";
-import { BugSplatContext } from "./context";
+import { BugSplatContext } from "./bugsplat-context";
 
 const INITIAL_STATE: ErrorBoundaryState = { error: null };
 
@@ -40,7 +40,7 @@ export interface ErrorBoundaryProps {
   /**
    * Callback called before error post to BugSplat.
    */
-  beforePost?: (error: Error | null, info: ErrorInfo | null) => void;
+  beforePost?: (bugSplat: BugSplat, error: Error | null, info: ErrorInfo | null) => void;
   /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
    */
@@ -123,7 +123,7 @@ export class ErrorBoundary extends Component<
 
     if (bugSplat) {
       if (beforePost) {
-        beforePost(error, errorInfo);
+        beforePost(bugSplat, error, errorInfo);
       }
 
       bugSplat.post(error, {

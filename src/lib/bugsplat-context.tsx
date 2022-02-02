@@ -34,14 +34,8 @@ export function BugSplatProvider(props: BugSplatProviderProps) {
  * Retrieve the BugSplat instance provided by a parent BugSplatProvider
  * @returns {BugSplat} BugSplat instance
  */
-export function useBugSplat(): BugSplat {
-  const bugSplatContext = useContext(BugSplatContext);
-
-  if (!bugSplatContext) {
-    throw new Error("Must call useBugSplat from a child of BugSplatProvider.");
-  }
-
-  return bugSplatContext;
+export function useBugSplat(): BugSplat | null {
+  return useContext(BugSplatContext);
 }
 
 /**
@@ -49,16 +43,17 @@ export function useBugSplat(): BugSplat {
  * into component props from context.
  */
 export function withBugSplat<P extends { bugSplat?: BugSplat }>(
-  Component: ComponentType<P>
+  Component: ComponentType<P>,
+  bugSplat?: BugSplat
 ): ComponentType<P> {
   const WithBugSplat: ComponentType<P> = (props) => {
-    const bugSplat = useBugSplat();
+    const bugSplatContext = useBugSplat();
 
-    return <Component bugSplat={bugSplat} {...props} />;
+    return <Component bugSplat={bugSplat ?? bugSplatContext} {...props} />;
   };
   const componentDisplayName =
     Component.displayName || Component.name || "Component";
-  WithBugSplat.displayName = `WithBugSplat(${componentDisplayName})`;
+  WithBugSplat.displayName = `BugSplat(${componentDisplayName})`;
 
   return WithBugSplat;
 }

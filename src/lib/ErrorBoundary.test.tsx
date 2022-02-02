@@ -2,7 +2,7 @@ import { fireEvent, render } from "@testing-library/react";
 import { useState } from "react";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { BugSplat } from "bugsplat";
-import { BugSplatProvider } from "./context";
+import { BugSplatProvider } from "./bugsplat-context";
 
 const mockPost = jest.fn();
 jest.mock("bugsplat", () => ({
