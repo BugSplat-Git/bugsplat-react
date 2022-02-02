@@ -17,7 +17,7 @@
   "author": "zmriel",
   "license": "ISC",
   "dependencies": {
-    "bugsplat": "^7.1.0"
+    "bugsplat": "^7.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
