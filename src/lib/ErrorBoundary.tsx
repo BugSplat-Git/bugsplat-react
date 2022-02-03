@@ -1,4 +1,4 @@
-import { BugSplat } from "bugsplat";
+import { BugSplat, BugSplatResponse } from 'bugsplat';
 import {
   Component,
   ContextType,
@@ -6,8 +6,8 @@ import {
   FunctionComponent,
   isValidElement,
   ReactElement,
-} from "react";
-import { BugSplatContext } from "./bugsplat-context";
+} from 'react';
+import { BugSplatContext } from './bugsplat-context';
 
 const INITIAL_STATE: ErrorBoundaryState = { error: null };
 
@@ -40,11 +40,19 @@ export interface ErrorBoundaryProps {
   /**
    * Callback called before error post to BugSplat.
    */
-  beforePost?: (bugSplat: BugSplat, error: Error | null, info: ErrorInfo | null) => void;
+  beforePost?: (
+    bugSplat: BugSplat,
+    error: Error | null,
+    info: ErrorInfo | null
+  ) => void;
   /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
    */
-  onError?: (error: Error, info: ErrorInfo) => void;
+  onError?: (
+    error: Error,
+    info: ErrorInfo,
+    response?: BugSplatResponse
+  ) => void;
   /**
    * Callback called on componentDidMount().
    */
@@ -117,28 +125,32 @@ export class ErrorBoundary extends Component<
     this.setState(INITIAL_STATE);
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  async handleError(error: Error, errorInfo: ErrorInfo) {
     const { onError, beforePost } = this.props;
     const bugSplat = this.props.bugSplat || this.context;
+    let response: BugSplatResponse | undefined;
 
     if (bugSplat) {
-      if (beforePost) {
-        beforePost(bugSplat, error, errorInfo);
+      beforePost?.(bugSplat, error, errorInfo);
+      try {
+        response = await bugSplat.post(error, {
+          additionalFormDataParams: [
+            {
+              key: 'componentStack',
+              value: errorInfo.componentStack,
+            },
+          ],
+        });
+      } catch (err) {
+        console.error(err);
       }
-
-      bugSplat.post(error, {
-        additionalFormDataParams: [
-          {
-            key: "componentStack",
-            value: errorInfo.componentStack,
-          },
-        ],
-      });
     }
 
-    if (onError) {
-      onError(error, errorInfo);
-    }
+    onError?.(error, errorInfo, response);
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.handleError(error, errorInfo);
   }
 
   componentDidUpdate(
@@ -173,7 +185,7 @@ export class ErrorBoundary extends Component<
     if (error) {
       if (isValidElement(fallback)) {
         return fallback;
-      } else if (typeof fallback === "function") {
+      } else if (typeof fallback === 'function') {
         return fallback({ error, resetErrorBoundary: this.resetErrorBoundary });
       } else {
         return null;

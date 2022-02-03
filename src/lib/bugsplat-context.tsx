@@ -1,9 +1,9 @@
-import { BugSplat } from "bugsplat";
-import { ComponentType, createContext, useContext } from "react";
-import { ReactNode } from "react";
+import { BugSplat } from 'bugsplat';
+import { ComponentType, createContext, useContext } from 'react';
+import { ReactNode } from 'react';
 
 export const BugSplatContext = createContext<BugSplat | null>(null);
-BugSplatContext.displayName = "BugSplatContext";
+BugSplatContext.displayName = 'BugSplatContext';
 
 export interface BugSplatProviderProps {
   /**
@@ -52,7 +52,7 @@ export function withBugSplat<P extends { bugSplat?: BugSplat }>(
     return <Component bugSplat={bugSplat ?? bugSplatContext} {...props} />;
   };
   const componentDisplayName =
-    Component.displayName || Component.name || "Component";
+    Component.displayName || Component.name || 'Component';
   WithBugSplat.displayName = `BugSplat(${componentDisplayName})`;
 
   return WithBugSplat;

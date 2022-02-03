@@ -1,10 +1,10 @@
-import { ComponentType } from "react";
-import ErrorBoundary, { ErrorBoundaryProps } from "./ErrorBoundary";
+import { ComponentType } from 'react';
+import ErrorBoundary, { ErrorBoundaryProps } from './ErrorBoundary';
 
 /**
  * Higher order component to wrap your component tree with ErrorBoundary
  */
- export default function withErrorBoundary<P extends Record<string, unknown>>(
+export default function withErrorBoundary<P extends Record<string, unknown>>(
   Component: ComponentType<P>,
   errorBoundaryProps: ErrorBoundaryProps = {}
 ): ComponentType<P> {
@@ -15,7 +15,7 @@ import ErrorBoundary, { ErrorBoundaryProps } from "./ErrorBoundary";
   );
 
   const componentDisplayName =
-    Component.displayName || Component.name || "Component";
+    Component.displayName || Component.name || 'Component';
 
   WrappedComponent.displayName = `ErrorBoundary(${componentDisplayName})`;
 

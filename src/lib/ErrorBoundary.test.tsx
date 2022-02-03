@@ -1,36 +1,36 @@
-import { fireEvent, render } from "@testing-library/react";
-import { useState } from "react";
-import { ErrorBoundary } from "./ErrorBoundary";
-import { BugSplat } from "bugsplat";
-import { BugSplatProvider } from "./bugsplat-context";
+import { fireEvent, render } from '@testing-library/react';
+import { useState } from 'react';
+import { ErrorBoundary } from './ErrorBoundary';
+import { BugSplat } from 'bugsplat';
+import { BugSplatProvider } from './bugsplat-context';
 
-const mockPost = jest.fn();
-jest.mock("bugsplat", () => ({
+const mockPost = jest.fn(async () => ({}));
+jest.mock('bugsplat', () => ({
   BugSplat: jest.fn().mockImplementation(() => ({
     post: mockPost,
   })),
 }));
 
 function BlowUp(): JSX.Element {
-  throw new Error("Error thrown during render.");
+  throw new Error('Error thrown during render.');
 }
 
 beforeEach(() => {
   mockPost.mockClear();
 });
 
-describe("<ErrorBoundary />", () => {
-  it("should render children when there is no error", () => {
+describe('<ErrorBoundary />', () => {
+  it('should render children when there is no error', () => {
     const { queryByText } = render(
       <ErrorBoundary>
         <div>Child Div</div>
       </ErrorBoundary>
     );
-    const childDiv = queryByText("Child Div");
+    const childDiv = queryByText('Child Div');
     expect(childDiv).toBeInTheDocument();
   });
 
-  it("calls onMount when mounted", () => {
+  it('calls onMount when mounted', () => {
     const mockOnMount = jest.fn();
 
     render(
@@ -42,7 +42,7 @@ describe("<ErrorBoundary />", () => {
     expect(mockOnMount).toHaveBeenCalledTimes(1);
   });
 
-  it("calls onUnmount when unmounted", () => {
+  it('calls onUnmount when unmounted', () => {
     const mockOnUnmount = jest.fn();
 
     const { unmount } = render(
@@ -56,8 +56,8 @@ describe("<ErrorBoundary />", () => {
     expect(mockOnUnmount).toHaveBeenCalledTimes(1);
   });
 
-  describe("when a rendering error has occurred", () => {
-    it("should call onError", () => {
+  describe('when a rendering error has occurred', () => {
+    it('should call onError', () => {
       const mockOnError = jest.fn();
       render(
         <ErrorBoundary onError={mockOnError}>
@@ -68,9 +68,9 @@ describe("<ErrorBoundary />", () => {
       expect(mockOnError).toHaveBeenCalledTimes(1);
     });
 
-    describe("when BugSplat instance passed as prop", () => {
-      const bugSplat = new BugSplat("test-db", "test", "1.33.7");
-      it("should call BugSplat.post", () => {
+    describe('when BugSplat instance passed as prop', () => {
+      const bugSplat = new BugSplat('test-db', 'test', '1.33.7');
+      it('should call BugSplat.post', () => {
         render(
           <ErrorBoundary bugSplat={bugSplat}>
             <BlowUp />
@@ -80,7 +80,7 @@ describe("<ErrorBoundary />", () => {
         expect(mockPost).toHaveBeenCalledTimes(1);
       });
 
-      it("should call beforePost", () => {
+      it('should call beforePost', () => {
         const mockBeforePost = jest.fn();
         render(
           <ErrorBoundary bugSplat={bugSplat} beforePost={mockBeforePost}>
@@ -93,9 +93,9 @@ describe("<ErrorBoundary />", () => {
       });
     });
 
-    describe("when child of BugSplatProvider", () => {
-      const bugSplat = new BugSplat("test-db", "test", "1.33.7");
-      it("should call BugSplat.post", () => {
+    describe('when child of BugSplatProvider', () => {
+      const bugSplat = new BugSplat('test-db', 'test', '1.33.7');
+      it('should call BugSplat.post', () => {
         render(
           <BugSplatProvider bugSplat={bugSplat}>
             <ErrorBoundary>
@@ -107,7 +107,7 @@ describe("<ErrorBoundary />", () => {
         expect(mockPost).toHaveBeenCalledTimes(1);
       });
 
-      it("should call beforePost", () => {
+      it('should call beforePost', () => {
         const mockBeforePost = jest.fn();
         render(
           <BugSplatProvider bugSplat={bugSplat}>
@@ -122,7 +122,7 @@ describe("<ErrorBoundary />", () => {
       });
     });
 
-    it("should not call BugSplat callbacks if no instance is present", () => {
+    it('should not call BugSplat callbacks if no instance is present', () => {
       const mockBeforePost = jest.fn();
       render(
         <ErrorBoundary beforePost={mockBeforePost}>
@@ -134,7 +134,7 @@ describe("<ErrorBoundary />", () => {
       expect(mockBeforePost).toHaveBeenCalledTimes(0);
     });
 
-    it("should render a basic fallback element", () => {
+    it('should render a basic fallback element', () => {
       const { queryByText } = render(
         <ErrorBoundary fallback={<p>This is fallback</p>}>
           <div>Child Div</div>
@@ -142,11 +142,11 @@ describe("<ErrorBoundary />", () => {
         </ErrorBoundary>
       );
 
-      expect(queryByText("Child Div")).not.toBeInTheDocument();
-      expect(queryByText("This is fallback")).toBeInTheDocument();
+      expect(queryByText('Child Div')).not.toBeInTheDocument();
+      expect(queryByText('This is fallback')).toBeInTheDocument();
     });
 
-    it("should render a fallback render prop", () => {
+    it('should render a fallback render prop', () => {
       const { queryByText } = render(
         <ErrorBoundary fallback={() => <p>This is fallback</p>}>
           <div>Child Div</div>
@@ -154,14 +154,14 @@ describe("<ErrorBoundary />", () => {
         </ErrorBoundary>
       );
 
-      expect(queryByText("Child Div")).not.toBeInTheDocument();
-      expect(queryByText("This is fallback")).toBeInTheDocument();
+      expect(queryByText('Child Div')).not.toBeInTheDocument();
+      expect(queryByText('This is fallback')).toBeInTheDocument();
     });
 
-    it("supports automatic reset when resetKeys change", () => {
+    it('supports automatic reset when resetKeys change', () => {
       const handleResetKeysChange = jest.fn();
       const handleReset = jest.fn<void, unknown[]>();
-      const TRY_AGAIN_ARGS = ["TRY_AGAIN_ARG1", "TRY_AGAIN_ARG2"];
+      const TRY_AGAIN_ARGS = ['TRY_AGAIN_ARG1', 'TRY_AGAIN_ARG2'];
 
       function App() {
         const [explode, setExplode] = useState(false);
@@ -199,45 +199,45 @@ describe("<ErrorBoundary />", () => {
 
       // blow it up
       const { getByText, getByRole, queryByRole } = render(<App />);
-      fireEvent.click(getByText("toggle explode"));
-      expect(getByRole("alert")).toBeInTheDocument();
+      fireEvent.click(getByText('toggle explode'));
+      expect(getByRole('alert')).toBeInTheDocument();
 
       // recover via try again button
-      fireEvent.click(getByText("Try Again"));
-      expect(queryByRole("alert")).not.toBeInTheDocument();
+      fireEvent.click(getByText('Try Again'));
+      expect(queryByRole('alert')).not.toBeInTheDocument();
       expect(handleReset).toHaveBeenCalledWith(...TRY_AGAIN_ARGS);
       expect(handleReset).toHaveBeenCalledTimes(1);
       handleReset.mockClear();
       expect(handleResetKeysChange).not.toHaveBeenCalled();
 
       // blow up again
-      fireEvent.click(getByText("toggle explode"));
-      expect(getByRole("alert")).toBeInTheDocument();
+      fireEvent.click(getByText('toggle explode'));
+      expect(getByRole('alert')).toBeInTheDocument();
 
       // recover via resetKeys change
-      fireEvent.click(getByText("toggle explode"));
+      fireEvent.click(getByText('toggle explode'));
       expect(handleResetKeysChange).toHaveBeenCalledWith([true], [false]);
       expect(handleResetKeysChange).toHaveBeenCalledTimes(1);
       handleResetKeysChange.mockClear();
       expect(handleReset).not.toHaveBeenCalled();
-      expect(queryByRole("alert")).not.toBeInTheDocument();
+      expect(queryByRole('alert')).not.toBeInTheDocument();
 
       // blow it up again
-      fireEvent.click(getByText("toggle explode"));
-      expect(getByRole("alert")).toBeInTheDocument();
+      fireEvent.click(getByText('toggle explode'));
+      expect(getByRole('alert')).toBeInTheDocument();
 
       // toggles adding reset key to Array
       // expect error to re-render
-      fireEvent.click(getByText("toggle extra reset key"));
+      fireEvent.click(getByText('toggle extra reset key'));
       expect(handleReset).not.toHaveBeenCalled();
       expect(handleResetKeysChange).toHaveBeenCalledTimes(1);
       expect(handleResetKeysChange).toHaveBeenCalledWith([true], [true, true]);
       handleResetKeysChange.mockClear();
-      expect(getByRole("alert")).toBeInTheDocument();
+      expect(getByRole('alert')).toBeInTheDocument();
 
       // toggle explode back to false
       // expect error to re-render again
-      fireEvent.click(getByText("toggle explode"));
+      fireEvent.click(getByText('toggle explode'));
       expect(handleReset).not.toHaveBeenCalled();
       expect(handleResetKeysChange).toHaveBeenCalledTimes(1);
       expect(handleResetKeysChange).toHaveBeenCalledWith(
@@ -245,11 +245,11 @@ describe("<ErrorBoundary />", () => {
         [false, true]
       );
       handleResetKeysChange.mockClear();
-      expect(getByRole("alert")).toBeInTheDocument();
+      expect(getByRole('alert')).toBeInTheDocument();
 
       // toggle extra reset key
       // expect error to be reset
-      fireEvent.click(getByText("toggle extra reset key"));
+      fireEvent.click(getByText('toggle extra reset key'));
       expect(handleReset).not.toHaveBeenCalled();
       expect(handleResetKeysChange).toHaveBeenCalledTimes(1);
       expect(handleResetKeysChange).toHaveBeenCalledWith(
@@ -257,7 +257,7 @@ describe("<ErrorBoundary />", () => {
         [false]
       );
       handleResetKeysChange.mockClear();
-      expect(queryByRole("alert")).not.toBeInTheDocument();
+      expect(queryByRole('alert')).not.toBeInTheDocument();
     });
   });
 });
