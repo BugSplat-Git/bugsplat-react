@@ -1,4 +1,4 @@
-export * from './ErrorBoundary';
+export * from './error-boundary';
 export * from './bugsplat-context';
-export { default as withErrorBoundary } from './withErrorBoundary';
-export { default as useErrorHandler } from './useErrorHandler';
+export { default as withErrorBoundary } from './with-error-boundary';
+export { default as useErrorHandler } from './use-error-handler';

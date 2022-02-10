@@ -1,6 +1,6 @@
 import { fireEvent, render } from '@testing-library/react';
 import { useState } from 'react';
-import { ErrorBoundary } from './ErrorBoundary';
+import { ErrorBoundary } from './error-boundary';
 import { BugSplat } from 'bugsplat';
 import { BugSplatProvider } from './bugsplat-context';
 

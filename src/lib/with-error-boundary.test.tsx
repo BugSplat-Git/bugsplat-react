@@ -1,4 +1,4 @@
-import withErrorBoundary from './withErrorBoundary';
+import withErrorBoundary from './with-error-boundary';
 
 describe('withErrorBoundary', () => {
   it('sets displayName properly', () => {
