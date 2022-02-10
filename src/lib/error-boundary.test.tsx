@@ -91,6 +91,22 @@ describe('<ErrorBoundary />', () => {
         expect(mockPost).toHaveBeenCalledTimes(1);
         expect(mockBeforePost).toHaveBeenCalledTimes(1);
       });
+
+      it('should not post if skipPost is set to true', () => {
+        const mockBeforePost = jest.fn();
+        render(
+          <ErrorBoundary
+            skipPost
+            bugSplat={bugSplat}
+            beforePost={mockBeforePost}
+          >
+            <BlowUp />
+          </ErrorBoundary>
+        );
+
+        expect(mockPost).toHaveBeenCalledTimes(0);
+        expect(mockBeforePost).toHaveBeenCalledTimes(0);
+      });
     });
 
     describe('when child of BugSplatProvider', () => {
@@ -119,6 +135,20 @@ describe('<ErrorBoundary />', () => {
 
         expect(mockPost).toHaveBeenCalledTimes(1);
         expect(mockBeforePost).toHaveBeenCalledTimes(1);
+      });
+
+      it('should not post if skipPost is set to true', () => {
+        const mockBeforePost = jest.fn();
+        render(
+          <BugSplatProvider bugSplat={bugSplat}>
+            <ErrorBoundary skipPost beforePost={mockBeforePost}>
+              <BlowUp />
+            </ErrorBoundary>
+          </BugSplatProvider>
+        );
+
+        expect(mockPost).toHaveBeenCalledTimes(0);
+        expect(mockBeforePost).toHaveBeenCalledTimes(0);
       });
     });
 

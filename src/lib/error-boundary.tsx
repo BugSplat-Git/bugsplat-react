@@ -90,6 +90,11 @@ export interface ErrorBoundaryProps {
    * This can be an element or a function that renders an element.
    */
   fallback?: FallbackElement | FallbackRender;
+  /**
+   * If true, caught errors will not be automatically
+   * posted to BugSplat.
+   */
+  skipPost?: boolean;
 }
 
 export interface ErrorBoundaryState {
@@ -126,11 +131,11 @@ export class ErrorBoundary extends Component<
   }
 
   async handleError(error: Error, errorInfo: ErrorInfo) {
-    const { onError, beforePost } = this.props;
+    const { onError, beforePost, skipPost } = this.props;
     const bugSplat = this.props.bugSplat || this.context;
     let response: BugSplatResponse | undefined;
 
-    if (bugSplat) {
+    if (bugSplat && !skipPost) {
       beforePost?.(bugSplat, error, errorInfo);
       try {
         response = await bugSplat.post(error, {

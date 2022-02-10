@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
 /**
- * Declaratively or imperatively propagate errors to
- * the nearest error boundary.
+ * Utility hook to declaratively or imperatively propagate an
+ * error to the nearest error boundary.
+ * *Should only be called from a child of ErrorBoundary*
  *
  * * Pass an error prop to declaratively propagate errors
  * when its value is truthy
