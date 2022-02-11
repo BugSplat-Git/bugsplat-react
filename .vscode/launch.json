@@ -7,7 +7,7 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
-      "program": "${workspaceFolder}\\node_modules\\.bin\\jest",
+      "program": "${workspaceFolder}\\jest",
       "cwd": "${workspaceFolder}",
       "args": ["--runInBand", "--watchAll=false"]
     }

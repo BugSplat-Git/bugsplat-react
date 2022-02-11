@@ -9,8 +9,6 @@ import {
 } from 'react';
 import { BugSplatContext } from './bugsplat-context';
 
-const INITIAL_STATE: ErrorBoundaryState = { error: null };
-
 /**
  * Shallowly compare two arrays to determine if they are different.
  * Uses `Object.is` to perform comparison on each item.
@@ -23,6 +21,8 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
 
 export interface FallbackProps {
   error: Error;
+  componentStack: string | null;
+  response: BugSplatResponse | null;
   resetErrorBoundary: (...args: unknown[]) => void;
 }
 
@@ -43,15 +43,15 @@ export interface ErrorBoundaryProps {
   beforePost?: (
     bugSplat: BugSplat,
     error: Error | null,
-    info: ErrorInfo | null
+    componentStack: string | null
   ) => void;
   /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
    */
   onError?: (
     error: Error,
-    info: ErrorInfo,
-    response?: BugSplatResponse
+    componentStack: string,
+    response: BugSplatResponse | null
   ) => void;
   /**
    * Callback called on componentDidMount().
@@ -60,7 +60,11 @@ export interface ErrorBoundaryProps {
   /**
    * Callback called on componentWillUnmount().
    */
-  onUnmount?: (error: Error | null) => void;
+  onUnmount?: (
+    error: Error | null,
+    componentStack: string | null,
+    response: BugSplatResponse | null
+  ) => void;
   /**
    * Callback called before ErrorBoundary resets internal state,
    * resulting in rendering children again. This should be
@@ -70,7 +74,12 @@ export interface ErrorBoundaryProps {
    * *Not called when reset from change in resetKeys -
    * use onResetKeysChange for that.*
    */
-  onReset?: (...args: unknown[]) => void;
+  onReset?: (
+    error: Error | null,
+    componentStack: string | null,
+    response: BugSplatResponse | null,
+    extraArgs?: unknown[]
+  ) => void;
   /**
    * Callback called when keys passed to resetKeys are changed.
    */
@@ -99,7 +108,15 @@ export interface ErrorBoundaryProps {
 
 export interface ErrorBoundaryState {
   error: Error | null;
+  componentStack: ErrorInfo['componentStack'] | null;
+  response: BugSplatResponse | null;
 }
+
+const INITIAL_STATE: ErrorBoundaryState = {
+  error: null,
+  componentStack: null,
+  response: null,
+};
 
 /**
  * Handle errors that occur during rendering by wrapping
@@ -111,10 +128,6 @@ export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
-  static getDerivedStateFromError(error: Error) {
-    return { error };
-  }
-
   static contextType = BugSplatContext;
 
   declare context: ContextType<typeof BugSplatContext>;
@@ -122,7 +135,8 @@ export class ErrorBoundary extends Component<
   state = INITIAL_STATE;
 
   resetErrorBoundary = (...args: unknown[]) => {
-    this.props.onReset?.(...args);
+    const { error, componentStack, response } = this.state;
+    this.props.onReset?.(error, componentStack, response, args);
     this.reset();
   };
 
@@ -130,19 +144,19 @@ export class ErrorBoundary extends Component<
     this.setState(INITIAL_STATE);
   }
 
-  async handleError(error: Error, errorInfo: ErrorInfo) {
+  async handleError(error: Error, { componentStack }: ErrorInfo) {
     const { onError, beforePost, skipPost } = this.props;
     const bugSplat = this.props.bugSplat || this.context;
-    let response: BugSplatResponse | undefined;
+    let response: BugSplatResponse | null = null;
 
     if (bugSplat && !skipPost) {
-      beforePost?.(bugSplat, error, errorInfo);
+      beforePost?.(bugSplat, error, componentStack);
       try {
         response = await bugSplat.post(error, {
           additionalFormDataParams: [
             {
               key: 'componentStack',
-              value: errorInfo.componentStack,
+              value: componentStack,
             },
           ],
         });
@@ -151,7 +165,8 @@ export class ErrorBoundary extends Component<
       }
     }
 
-    onError?.(error, errorInfo, response);
+    onError?.(error, componentStack, response);
+    this.setState({ error, componentStack, response });
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -180,18 +195,24 @@ export class ErrorBoundary extends Component<
   }
 
   componentWillUnmount() {
-    this.props.onUnmount?.(this.state.error);
+    const { error, componentStack, response } = this.state;
+    this.props.onUnmount?.(error, componentStack, response);
   }
 
   render() {
-    const { error } = this.state;
+    const { error, componentStack, response } = this.state;
     const { fallback, children } = this.props;
 
     if (error) {
       if (isValidElement(fallback)) {
         return fallback;
       } else if (typeof fallback === 'function') {
-        return fallback({ error, resetErrorBoundary: this.resetErrorBoundary });
+        return fallback({
+          error,
+          componentStack,
+          response,
+          resetErrorBoundary: this.resetErrorBoundary,
+        });
       } else {
         return null;
       }

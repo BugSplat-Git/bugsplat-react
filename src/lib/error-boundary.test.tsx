@@ -11,8 +11,10 @@ jest.mock('bugsplat', () => ({
   })),
 }));
 
+const BlowUpError = new Error('Error thrown during render.');
+
 function BlowUp(): JSX.Element {
-  throw new Error('Error thrown during render.');
+  throw BlowUpError;
 }
 
 beforeEach(() => {
@@ -235,7 +237,8 @@ describe('<ErrorBoundary />', () => {
       // recover via try again button
       fireEvent.click(getByText('Try Again'));
       expect(queryByRole('alert')).not.toBeInTheDocument();
-      expect(handleReset).toHaveBeenCalledWith(...TRY_AGAIN_ARGS);
+      const extraArgsCall = handleReset.mock.calls[0][3];
+      expect(extraArgsCall).toEqual(['TRY_AGAIN_ARG1', 'TRY_AGAIN_ARG2']);
       expect(handleReset).toHaveBeenCalledTimes(1);
       handleReset.mockClear();
       expect(handleResetKeysChange).not.toHaveBeenCalled();
