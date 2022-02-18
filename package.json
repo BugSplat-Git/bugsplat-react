@@ -1,7 +1,7 @@
 {
   "name": "bugsplat-react",
   "version": "0.1.0",
-  "description": "bugsplat bindings and utilities for react",
+  "description": "bugsplat utilities for react",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest",
