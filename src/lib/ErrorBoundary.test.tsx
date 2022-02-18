@@ -115,7 +115,7 @@ describe('<ErrorBoundary />', () => {
       const bugSplat = new BugSplat('test-db', 'test', '1.33.7');
       it('should call BugSplat.post', () => {
         render(
-          <BugSplatProvider bugSplat={bugSplat}>
+          <BugSplatProvider value={bugSplat}>
             <ErrorBoundary>
               <BlowUp />
             </ErrorBoundary>
@@ -128,7 +128,7 @@ describe('<ErrorBoundary />', () => {
       it('should call beforePost', () => {
         const mockBeforePost = jest.fn();
         render(
-          <BugSplatProvider bugSplat={bugSplat}>
+          <BugSplatProvider value={bugSplat}>
             <ErrorBoundary beforePost={mockBeforePost}>
               <BlowUp />
             </ErrorBoundary>
@@ -142,7 +142,7 @@ describe('<ErrorBoundary />', () => {
       it('should not post if skipPost is set to true', () => {
         const mockBeforePost = jest.fn();
         render(
-          <BugSplatProvider bugSplat={bugSplat}>
+          <BugSplatProvider value={bugSplat}>
             <ErrorBoundary skipPost beforePost={mockBeforePost}>
               <BlowUp />
             </ErrorBoundary>

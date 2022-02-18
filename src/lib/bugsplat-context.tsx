@@ -11,7 +11,7 @@ export interface BugSplatProviderProps {
    *
    * *Should be memoized if created in a component*
    */
-  bugSplat: BugSplat;
+  value: BugSplat;
   children: ReactNode;
 }
 
@@ -21,10 +21,10 @@ export interface BugSplatProviderProps {
  * @returns
  */
 export function BugSplatProvider(props: BugSplatProviderProps) {
-  const { children, bugSplat } = props;
+  const { children, value } = props;
 
   return (
-    <BugSplatContext.Provider value={bugSplat}>
+    <BugSplatContext.Provider value={value}>
       {children}
     </BugSplatContext.Provider>
   );
