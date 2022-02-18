@@ -1,5 +1,5 @@
 import { ComponentType } from 'react';
-import ErrorBoundary, { ErrorBoundaryProps } from './error-boundary';
+import ErrorBoundary, { ErrorBoundaryProps } from './ErrorBoundary';
 
 /**
  * Higher order component to wrap your component tree with ErrorBoundary
