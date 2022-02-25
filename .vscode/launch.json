@@ -7,9 +7,9 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
-      "program": "${workspaceFolder}\\jest",
       "cwd": "${workspaceFolder}",
-      "args": ["--runInBand", "--watchAll=false"]
+      "runtimeExecutable": "npm",
+      "args": ["run", "test", "--", "--runInBand", "--watchAll=false"]
     }
   ]
 }
