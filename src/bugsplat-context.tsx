@@ -9,7 +9,8 @@ export interface BugSplatProviderProps {
   /**
    * BugSplat instance
    *
-   * *Should be memoized if created in a component*
+   * *Should be memoized or created outside of
+   * render to preserve referential integrity*
    */
   value: BugSplat;
   children: ReactNode;
@@ -17,10 +18,8 @@ export interface BugSplatProviderProps {
 
 /**
  * Provide BugSplat instance to children.
- * @param props
- * @returns
  */
-export function BugSplatProvider(props: BugSplatProviderProps) {
+export function BugSplatProvider(props: BugSplatProviderProps): JSX.Element {
   const { children, value } = props;
 
   return (

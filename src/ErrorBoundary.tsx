@@ -95,6 +95,7 @@ export interface ErrorBoundaryProps {
   resetKeys?: unknown[];
   /**
    * Provide a fallback to render when ErrorBoundary catches an error.
+   * Not required, but it is highly recommended to provide a value for this.
    *
    * This can be an element or a function that renders an element.
    */

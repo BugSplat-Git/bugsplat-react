@@ -1,4 +1,4 @@
-import { withBugSplat } from './bugsplat-context';
+import { withBugSplat } from '../bugsplat-context';
 
 describe('withBugSplat', () => {
   it('sets displayName properly', () => {
