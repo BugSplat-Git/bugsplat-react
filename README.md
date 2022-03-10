@@ -18,8 +18,6 @@ npm install bugsplat-react --save
 
 In addition to standard `package.json` properties `name` and `version`, include a `database` property to your `package.json` file with the value of your BugSplat database. Make sure to replace {{database}} with your actual database name.
 
-`package.json`
-
 ```json
 {
   "name": "my-app",
