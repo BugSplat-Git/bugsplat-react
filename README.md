@@ -2,7 +2,7 @@
 
 ## Introduction
 
-BugSplat supports the collection of errors in React applications. The bugsplat-react npm package implements an [ErrorBoundary](https://reactjs.org/docs/error-boundaries.html) component in order to capture rendering errors in children and post them to BugSplat where they can be tracked and managed. The package also includes a [context](https://reactjs.org/docs/context.html) provider and additional utilities to further integrate BugSplat with your application and customize it to your needs. Adding BugSplat to your React application is extremely easy. Before getting started please complete the following tasks:
+BugSplat supports the collection of errors in React applications. The bugsplat-react npm package implements an [ErrorBoundary](https://reactjs.org/docs/error-boundaries.html) component in order to capture rendering errors in children and post them to BugSplat where they can be tracked and managed. The package also includes a [react context](https://reactjs.org/docs/context.html) provider and additional utilities to further integrate BugSplat with your application and customize it to your needs. Adding BugSplat to your React application is extremely easy. Before getting started please complete the following tasks:
 
 - [Sign up](https://app.bugsplat.com/v2/sign-up) for BugSplat
 - Create a new [database](https://app.bugsplat.com/v2/options?tab=database) for your application
@@ -16,17 +16,15 @@ To start using BugSplat in your React application, run the following command at 
 npm install bugsplat-react --save
 ```
 
-In addition to standard `package.json` properties `name` and `version`, include a `database` property to your `package.json` file with the value of your BugSplat database.
+In addition to standard `package.json` properties `name` and `version`, include a `database` property to your `package.json` file with the value of your BugSplat database. Make sure to replace {{database}} with your actual database name.
+
+`package.json`
 
 ```json
-// package.json
-
 {
   "name": "my-app",
   "version": "1.2.0",
-  "database": "{{database}}",
-  // replace {{database}} with actual database name
-  ...
+  "database": "{{database}}"
 }
 ```
 
