@@ -129,6 +129,10 @@ export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
   static contextType = BugSplatContext;
 
   declare context: ContextType<typeof BugSplatContext>;
@@ -157,7 +161,8 @@ export class ErrorBoundary extends Component<
           additionalFormDataParams: [
             {
               key: 'componentStack',
-              value: componentStack,
+              value: new Blob([componentStack]),
+              filename: 'componentStack.txt',
             },
           ],
         });
