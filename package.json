@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "bugsplat utilities for react",
   "main": "dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "test": "jest",
     "build": "tsc",
