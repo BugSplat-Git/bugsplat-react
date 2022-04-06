@@ -2,18 +2,18 @@
 
 ## Introduction
 
-BugSplat supports the collection of errors in React applications. The bugsplat-react npm package implements an [ErrorBoundary](https://reactjs.org/docs/error-boundaries.html) component in order to capture rendering errors in children and post them to BugSplat where they can be tracked and managed. The package also includes a [react context](https://reactjs.org/docs/context.html) provider and additional utilities to further integrate BugSplat with your application and customize it to your needs. Adding BugSplat to your React application is extremely easy. Before getting started please complete the following tasks:
+BugSplat supports the collection of errors in React applications. The bugsplat-react npm package implements an [ErrorBoundary](https://reactjs.org/docs/error-boundaries.html) component in order to capture rendering errors in child components and post them to BugSplat where they can be tracked and managed. The package also includes a [React context](https://reactjs.org/docs/context.html) provider and additional utilities to tailor BugSplat to the needs of your application. Adding BugSplat to your React application is extremely easy. Before getting started please complete the following tasks:
 
 - [Sign up](https://app.bugsplat.com/v2/sign-up) for BugSplat
-- Create a new [database](https://app.bugsplat.com/v2/options?tab=database) for your application
-<!-- * Check out the [live demo](https://www.bugsplat.com/platforms/react/my-react-crasher) of BugSplat’s React error reporting -->
+- Create a new [database](https://app.bugsplat.com/v2/settings/company/databases) for your application
+- Check out the [live demo](https://www.bugsplat.com/platforms/react/my-react-crasher) of BugSplat’s error reporting for React
 
 ## Get Started
 
 To start using BugSplat in your React application, run the following command at the root of your project. This will install bugsplat-react and its sub dependency [bugsplat](https://github.com/BugSplat-Git/bugsplat-js).
 
 ```shell
-npm install bugsplat-react --save
+npm i bugsplat-react --save
 ```
 
 In addition to standard `package.json` properties `name` and `version`, include a `database` property to your `package.json` file with the value of your BugSplat database. Make sure to replace {{database}} with your actual database name.
@@ -26,7 +26,7 @@ In addition to standard `package.json` properties `name` and `version`, include 
 }
 ```
 
-In the root of your project, import data from your `package.json` and initialize a new `BugSplat` instance with it. Now you can pass your newly created `BugSplat` instance to the `BugSplatProvider` at the root of your app in order to share it with all child components.
+In the root of your project, import data from your `package.json` and initialize a new `BugSplat` instance with it. Pass your newly created `BugSplat` instance to the `BugSplatProvider` at the root of your app in order to share it with all child components.
 
 ```jsx
 // src/index.tsx
@@ -50,7 +50,7 @@ ReactDOM.render(
 );
 ```
 
-With this provider, you are supplying the `BugSplat` instance to your application components through [react context](https://reactjs.org/docs/context.html). You can now wrap your component trees with `ErrorBoundary` to capture rendering errors and automatically post them to BugSplat with the instance you passed to `BugSplatProvider`.
+With this provider, you are supplying the `BugSplat` instance to your application components through [React context](https://reactjs.org/docs/context.html). You can now wrap your component trees with `ErrorBoundary` to capture rendering errors and automatically post them to BugSplat with the instance you passed to `BugSplatProvider`.
 
 ```jsx
 // src/App.tsx
@@ -80,7 +80,7 @@ export default function App() {
     <div>
       <h1>Hello, world!</h1>
       <button onClick={() => bugSplat.post('There was a problem')}>
-        Post Message
+        Post Error Report
       </button>
     </div>
   );
@@ -137,7 +137,7 @@ export default function App() {
 }
 ```
 
-In it's simplest form, the `ErrorBoundary` component just catches rendering errors in its children and can be used without BugSplat integrated at all. To utilize the full power of `ErrorBoundary`, pass it a `BugSplat` instance through a parent `BugSplatProvider` or with the `bugSplat` prop. If both are provided, the prop will take preference over the context value.
+In it's simplest form, the `ErrorBoundary` component catches rendering errors in child components and can be used without integrating BugSplat. To utilize the full power of `ErrorBoundary`, pass a `BugSplat` instance through a parent `BugSplatProvider` or with the `bugSplat` prop. If both `BugSplatProvider` and the `bugSplat` prop are provided, the prop will take preference over the context value.
 
 ```jsx
 function Component() {
@@ -151,9 +151,9 @@ function Component() {
 }
 ```
 
-Doing this will enable the fully integrated `ErrorBoundary` to automatically post any errors it catches to BugSplat.
+Providing an instance of BugSplat will allow `ErrorBoundary` to automatically post errors it catches to BugSplat.
 
-The `ErrorBoundary` component is packed with props that can be used to customize it to your exact needs:
+The `ErrorBoundary` component is packed with props that can be used to customize it to fit your needs:
 
 - `fallback`
 - `onMount`
@@ -163,9 +163,9 @@ The `ErrorBoundary` component is packed with props that can be used to customize
 - `onReset`
 - `onResetKeysChange`
 
-We highly recommend passing a `fallback` prop to render when `ErrorBoundary` encounters an error.
+We strongly recommend passing a `fallback` prop that will be rendered when `ErrorBoundary` encounters an error.
 
-This can be a valid element
+The `fallback` prop can be any valid element:
 
 ```jsx
 function Component() {
@@ -198,7 +198,7 @@ If `fallback` is a function, it will be called with
 
 The fallback will render any time the `ErrorBoundary` catches an error. It is useful to have a fallback UI to gracefully handle errors for your users, while still sending errors to BugSplat behind the scenes.
 
-`ErrorBoundary` accepts a resetKeys prop that you can pass with an array of values that will cause it to automatically reset if one of those values changes. This gives you the power to control the error state from outside of the component.
+`ErrorBoundary` accepts a `resetKeys` prop that you can pass with an array of values that will cause it to automatically reset if one of those values changes. This gives you the power to control the error state from outside of the component.
 
 ```jsx
 function App() {
@@ -310,7 +310,7 @@ interface ErrorBoundaryProps {
   /**
    * Callback called before ErrorBoundary resets internal state,
    * resulting in rendering children again. This should be
-   * used to ensure that rerendering of children would not
+   * used to ensure that re-rendering of children would not
    * repeat the same error that occurred.
    *
    * *Not called when reset from change in resetKeys -
