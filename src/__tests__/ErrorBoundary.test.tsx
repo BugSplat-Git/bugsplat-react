@@ -2,11 +2,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { ErrorBoundary } from '../ErrorBoundary';
 import type { BugSplat, BugSplatOptions, BugSplatResponse } from 'bugsplat';
-import { updateBugSplatStore } from '../core/global';
+import { setBugSplatStore, updateBugSplatStore } from '../core/global';
 
 const mockPost = jest.fn(
   async (_errorToPost: string | Error, _options?: BugSplatOptions) =>
-    ({} as BugSplatResponse)
+    new Promise<BugSplatResponse>(() => ({}))
 );
 
 const BlowUpError = new Error('Error thrown during render.');
@@ -17,15 +17,6 @@ function BlowUp(): JSX.Element {
 
 beforeEach(() => {
   mockPost.mockReset();
-  updateBugSplatStore({
-    instance: {
-      post: mockPost,
-    } as unknown as BugSplat,
-  });
-});
-
-afterEach(() => {
-  updateBugSplatStore({});
 });
 
 describe('<ErrorBoundary />', () => {
@@ -66,92 +57,7 @@ describe('<ErrorBoundary />', () => {
   });
 
   describe('when a rendering error has occurred', () => {
-    it('should call onError', async () => {
-      const mockOnError = jest.fn();
-      render(
-        <ErrorBoundary onError={mockOnError}>
-          <BlowUp />
-        </ErrorBoundary>
-      );
-
-      await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
-    });
-
-    it('should call BugSplat.post', () => {
-      render(
-        <ErrorBoundary>
-          <BlowUp />
-        </ErrorBoundary>
-      );
-
-      expect(mockPost).toHaveBeenCalledTimes(1);
-    });
-
-    it('should call beforePost', () => {
-      const mockBeforePost = jest.fn();
-      render(
-        <ErrorBoundary beforePost={mockBeforePost}>
-          <BlowUp />
-        </ErrorBoundary>
-      );
-
-      expect(mockPost).toHaveBeenCalledTimes(1);
-      expect(mockBeforePost).toHaveBeenCalledTimes(1);
-    });
-
-    it('should not post if skipPost is set to true', () => {
-      const mockBeforePost = jest.fn();
-      render(
-        <ErrorBoundary skipPost beforePost={mockBeforePost}>
-          <BlowUp />
-        </ErrorBoundary>
-      );
-
-      expect(mockPost).toHaveBeenCalledTimes(0);
-      expect(mockBeforePost).toHaveBeenCalledTimes(0);
-    });
-
-    // describe('when child of BugSplatProvider', () => {
-    //   const bugSplat = new BugSplat('test-db', 'test', '1.33.7');
-    //   it('should call BugSplat.post', () => {
-    //     render(
-    //         <ErrorBoundary>
-    //           <BlowUp />
-    //         </ErrorBoundary>
-    //     );
-
-    //     expect(mockPost).toHaveBeenCalledTimes(1);
-    //   });
-
-    //   it('should call beforePost', () => {
-    //     const mockBeforePost = jest.fn();
-    //     render(
-    //         <ErrorBoundary beforePost={mockBeforePost}>
-    //           <BlowUp />
-    //         </ErrorBoundary>
-    //     );
-
-    //     expect(mockPost).toHaveBeenCalledTimes(1);
-    //     expect(mockBeforePost).toHaveBeenCalledTimes(1);
-    //   });
-
-    //   it('should not post if skipPost is set to true', () => {
-    //     const mockBeforePost = jest.fn();
-    //     render(
-    //       <BugSplatProvider value={bugSplat}>
-    //         <ErrorBoundary skipPost beforePost={mockBeforePost}>
-    //           <BlowUp />
-    //         </ErrorBoundary>
-    //       </BugSplatProvider>
-    //     );
-
-    //     expect(mockPost).toHaveBeenCalledTimes(0);
-    //     expect(mockBeforePost).toHaveBeenCalledTimes(0);
-    //   });
-    // });
-
     it('should not call BugSplat callbacks if no instance is present', () => {
-      updateBugSplatStore({});
       const mockBeforePost = jest.fn();
       render(
         <ErrorBoundary beforePost={mockBeforePost}>
@@ -161,6 +67,68 @@ describe('<ErrorBoundary />', () => {
 
       expect(mockPost).toHaveBeenCalledTimes(0);
       expect(mockBeforePost).toHaveBeenCalledTimes(0);
+    });
+
+    describe('when BugSplat has been initialized', () => {
+      beforeEach(() => {
+        updateBugSplatStore({
+          instance: {
+            post: mockPost,
+          } as unknown as BugSplat,
+        });
+      });
+
+      afterEach(() => {
+        setBugSplatStore({
+          instance: undefined,
+          logger: console,
+        });
+      });
+
+      it('should call onError', async () => {
+        const mockOnError = jest.fn();
+        render(
+          <ErrorBoundary onError={mockOnError}>
+            <BlowUp />
+          </ErrorBoundary>
+        );
+
+        await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
+      });
+
+      it('should not post if skipPost is set to true', () => {
+        const mockBeforePost = jest.fn();
+        render(
+          <ErrorBoundary skipPost beforePost={mockBeforePost}>
+            <BlowUp />
+          </ErrorBoundary>
+        );
+
+        expect(mockPost).toHaveBeenCalledTimes(0);
+        expect(mockBeforePost).toHaveBeenCalledTimes(0);
+      });
+
+      it('should call BugSplat.post', () => {
+        render(
+          <ErrorBoundary>
+            <BlowUp />
+          </ErrorBoundary>
+        );
+
+        expect(mockPost).toHaveBeenCalledTimes(1);
+      });
+
+      it('should call beforePost', () => {
+        const mockBeforePost = jest.fn();
+        render(
+          <ErrorBoundary beforePost={mockBeforePost}>
+            <BlowUp />
+          </ErrorBoundary>
+        );
+
+        expect(mockPost).toHaveBeenCalledTimes(1);
+        expect(mockBeforePost).toHaveBeenCalledTimes(1);
+      });
     });
 
     it('should render a basic fallback element', () => {

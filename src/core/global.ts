@@ -11,10 +11,16 @@ const defaultBugSplatStore: BugSplatStore = {
   logger: console,
 };
 
+/**
+ * Represents a partial of globalThis that we care about
+ */
 export type Root = { __BUGSPLAT__?: BugSplatStore };
 
 const fallbackGlobalThis = {};
 
+/**
+ * Get `globalThis` with a fallback
+ */
 function getGlobalRoot(): Root {
   return (globalThis ?? fallbackGlobalThis) as Root;
 }
@@ -42,4 +48,11 @@ export function updateBugSplatStore(
     ...root.__BUGSPLAT__,
     ...value,
   };
+}
+
+/**
+ * Replace global BugSplat store with `value`
+ */
+export function setBugSplatStore(value: BugSplatStore, root = getGlobalRoot()) {
+  root.__BUGSPLAT__ = value;
 }
