@@ -11,17 +11,12 @@ const defaultBugSplatStore: BugSplatStore = {
   logger: console,
 };
 
-declare global {
-  // eslint-disable-next-line no-var
-  var __BUGSPLAT__: BugSplatStore | undefined;
-}
-
 type Root = { __BUGSPLAT__?: BugSplatStore };
 
 const fallbackGlobalThis = {};
 
 function getGlobalRoot(): Root {
-  return globalThis ?? fallbackGlobalThis;
+  return (globalThis ?? fallbackGlobalThis) as Root;
 }
 
 /**
@@ -35,18 +30,16 @@ export function getBugSplatStore(root = getGlobalRoot()): BugSplatStore {
 }
 
 /**
- * Set global BugSplat store.
- *
- * **This will replace an existing value.**
+ * Set global BugSplat store by shallow
+ * merging `value` with current store
  */
 export function updateBugSplatStore(
   value: Partial<BugSplatStore>,
   root = getGlobalRoot()
 ) {
-  root.__BUGSPLAT__ = Object.assign(
-    {},
-    defaultBugSplatStore,
-    root.__BUGSPLAT__,
-    value
-  );
+  root.__BUGSPLAT__ = {
+    ...defaultBugSplatStore,
+    ...root.__BUGSPLAT__,
+    ...value,
+  };
 }
