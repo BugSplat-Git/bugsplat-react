@@ -57,7 +57,10 @@ export function init({
   updateBugSplatStore({ instance }, root);
 }
 
-export function getBugSplatInstance() {
+/**
+ * @returns global BugSplat instance
+ */
+export function getBugSplat() {
   const { instance } = getBugSplatStore();
 
   // if (!instance) {

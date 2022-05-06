@@ -7,7 +7,7 @@ import {
   ReactElement,
   ReactNode,
 } from 'react';
-import { getBugSplatInstance } from './core';
+import { getBugSplat } from './core';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -171,7 +171,7 @@ export class ErrorBoundary extends Component<
   async handleError(error: Error, { componentStack }: ErrorInfo) {
     const { onError, beforePost, skipPost } = this.props;
 
-    const bugSplat = getBugSplatInstance();
+    const bugSplat = getBugSplat();
     let response: BugSplatResponse | null = null;
 
     if (bugSplat && !skipPost) {
