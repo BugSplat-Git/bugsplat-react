@@ -1,4 +1,4 @@
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 import useErrorHandler from '../useErrorHandler';
 import ErrorBoundary, { FallbackProps } from '../ErrorBoundary';
@@ -35,17 +35,17 @@ describe('useErrorHandler hook used in child of ErrorBoundary', () => {
       );
     }
 
-    const { getByRole, findByRole } = render(
+    render(
       <ErrorBoundary fallback={Fallback}>
         <AsyncComponent />
       </ErrorBoundary>
     );
 
-    fireEvent.click(getByRole('button', { name: /explode/i }));
-    await findByRole('alert');
+    fireEvent.click(screen.getByRole('button', { name: /explode/i }));
+    await screen.findByRole('alert');
 
-    fireEvent.click(getByRole('button', { name: /try again/i }));
-    await findByRole('main');
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    await screen.findByRole('main');
   });
 
   it('should propagate error passed declaratively as prop', async () => {
@@ -72,16 +72,16 @@ describe('useErrorHandler hook used in child of ErrorBoundary', () => {
       );
     }
 
-    const { getByRole, findByRole } = render(
+    render(
       <ErrorBoundary fallback={Fallback}>
         <AsyncComponent />
       </ErrorBoundary>
     );
 
-    fireEvent.click(getByRole('button', { name: /explode/i }));
-    await findByRole('alert');
+    fireEvent.click(screen.getByRole('button', { name: /explode/i }));
+    await screen.findByRole('alert');
 
-    fireEvent.click(getByRole('button', { name: /try again/i }));
-    await findByRole('main');
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    await screen.findByRole('main');
   });
 });

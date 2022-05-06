@@ -1,22 +1,38 @@
-import { BugSplat, BugSplatResponse } from 'bugsplat';
+import { BugSplat, BugSplatResponse, FormDataParam } from 'bugsplat';
 import {
   Component,
-  ContextType,
   ErrorInfo,
   FunctionComponent,
   isValidElement,
   ReactElement,
+  ReactNode,
 } from 'react';
-import { BugSplatContext } from './bugsplat-context';
+import { getBugSplatInstance } from './core';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
+ *
  * Uses `Object.is` to perform comparison on each item.
+ *
+ * @returns true if arrays are the same length and shallowly equal
  */
 function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
-  return (
-    a.length !== b.length || a.some((item, index) => !Object.is(item, b[index]))
-  );
+  if (a.length !== b.length) {
+    return true;
+  }
+
+  return a.some((item, index) => !Object.is(item, b[index]));
+}
+
+/**
+ * Packs a component stack string into an expected object shape
+ */
+function packComponentStack(componentStack: string): FormDataParam {
+  return {
+    key: 'componentStack',
+    value: new Blob([componentStack]),
+    filename: 'componentStack.txt',
+  };
 }
 
 export interface FallbackProps {
@@ -30,13 +46,10 @@ export type FallbackElement = ReactElement<
   unknown,
   string | FunctionComponent | typeof Component
 > | null;
+
 export type FallbackRender = (props: FallbackProps) => FallbackElement;
 
 export interface ErrorBoundaryProps {
-  /**
-   * BugSplat instance used to post errors.
-   */
-  bugSplat?: BugSplat;
   /**
    * Callback called before error post to BugSplat.
    */
@@ -105,11 +118,21 @@ export interface ErrorBoundaryProps {
    * posted to BugSplat.
    */
   skipPost?: boolean;
+  children?: ReactNode | ReactNode[];
 }
 
 export interface ErrorBoundaryState {
+  /**
+   * Rendering error; if one occurred.
+   */
   error: Error | null;
+  /**
+   * Component stack trace of a rendering error; if one occurred.
+   */
   componentStack: ErrorInfo['componentStack'] | null;
+  /**
+   * Response from a BugSplat crash post
+   */
   response: BugSplatResponse | null;
 }
 
@@ -133,10 +156,6 @@ export class ErrorBoundary extends Component<
     return { error };
   }
 
-  static contextType = BugSplatContext;
-
-  declare context: ContextType<typeof BugSplatContext>;
-
   state = INITIAL_STATE;
 
   resetErrorBoundary = (...args: unknown[]) => {
@@ -151,20 +170,15 @@ export class ErrorBoundary extends Component<
 
   async handleError(error: Error, { componentStack }: ErrorInfo) {
     const { onError, beforePost, skipPost } = this.props;
-    const bugSplat = this.props.bugSplat || this.context;
+
+    const bugSplat = getBugSplatInstance();
     let response: BugSplatResponse | null = null;
 
     if (bugSplat && !skipPost) {
       beforePost?.(bugSplat, error, componentStack);
       try {
         response = await bugSplat.post(error, {
-          additionalFormDataParams: [
-            {
-              key: 'componentStack',
-              value: new Blob([componentStack]),
-              filename: 'componentStack.txt',
-            },
-          ],
+          additionalFormDataParams: [packComponentStack(componentStack)],
         });
       } catch (err) {
         console.error(err);
@@ -176,7 +190,7 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.handleError(error, errorInfo);
+    this.handleError(error, errorInfo).catch(console.error);
   }
 
   componentDidUpdate(
@@ -184,14 +198,14 @@ export class ErrorBoundary extends Component<
     prevState: ErrorBoundaryState
   ) {
     const { error } = this.state;
-    const { resetKeys } = this.props;
+    const { resetKeys, onResetKeysChange } = this.props;
 
     if (
       error !== null &&
       prevState.error !== null &&
       isArrayDiff(prevProps.resetKeys, resetKeys)
     ) {
-      this.props.onResetKeysChange?.(prevProps.resetKeys, resetKeys);
+      onResetKeysChange?.(prevProps.resetKeys, resetKeys);
       this.reset();
     }
   }
