@@ -61,13 +61,5 @@ export function init({
  * @returns global BugSplat instance
  */
 export function getBugSplat() {
-  const { instance } = getBugSplatStore();
-
-  // if (!instance) {
-  //   throw new Error(
-  //     'BugSplat instance not found. Did you forget to initialize?'
-  //   );
-  // }
-
-  return instance;
+  return getBugSplatStore().instance;
 }
