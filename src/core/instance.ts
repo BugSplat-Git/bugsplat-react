@@ -1,5 +1,5 @@
 import { BugSplat } from 'bugsplat';
-import { getBugSplatStore, updateBugSplatStore } from './global';
+import { getBugSplatStore, Root, updateBugSplatStore } from './global';
 
 export interface BugSplatInit {
   /**
@@ -26,7 +26,7 @@ export interface BugSplatInit {
   /**
    * Specify a root object to attach the instance to.
    */
-  root?: Record<string, unknown>;
+  root?: Root;
 }
 
 /**
@@ -60,6 +60,12 @@ export function init({
 /**
  * @returns global BugSplat instance
  */
-export function getBugSplat(root?: Record<string, unknown>) {
-  return getBugSplatStore(root).instance;
+export function getBugSplat(root?: Root) {
+  const { instance } = getBugSplatStore(root);
+
+  if (!instance) {
+    throw new Error('BugSplat instance not found. Did you forget to init()?');
+  }
+
+  return instance;
 }

@@ -11,7 +11,7 @@ const defaultBugSplatStore: BugSplatStore = {
   logger: console,
 };
 
-type Root = { __BUGSPLAT__?: BugSplatStore };
+export type Root = { __BUGSPLAT__?: BugSplatStore };
 
 const fallbackGlobalThis = {};
 
