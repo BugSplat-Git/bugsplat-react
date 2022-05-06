@@ -60,6 +60,6 @@ export function init({
 /**
  * @returns global BugSplat instance
  */
-export function getBugSplat() {
-  return getBugSplatStore().instance;
+export function getBugSplat(root?: Record<string, unknown>) {
+  return getBugSplatStore(root).instance;
 }
