@@ -1,5 +1,5 @@
 import { BugSplat } from 'bugsplat';
-import { getBugSplatStore, Root, updateBugSplatStore } from './global';
+import { setBugSplat } from './store';
 
 export interface BugSplatInit {
   /**
@@ -23,10 +23,6 @@ export interface BugSplatInit {
     email?: string;
     user?: string;
   };
-  /**
-   * Specify a root object to attach the instance to.
-   */
-  root?: Root;
 }
 
 /**
@@ -37,7 +33,6 @@ export function init({
   application,
   version,
   defaults = {},
-  root,
 }: BugSplatInit) {
   const instance = new BugSplat(database, application, version);
 
@@ -54,18 +49,5 @@ export function init({
     instance.setDefaultUser(defaults.user);
   }
 
-  updateBugSplatStore({ instance }, root);
-}
-
-/**
- * @returns global BugSplat instance
- */
-export function getBugSplat(root?: Root) {
-  const { instance } = getBugSplatStore(root);
-
-  if (!instance) {
-    throw new Error('BugSplat instance not found. Did you forget to init()?');
-  }
-
-  return instance;
+  setBugSplat(instance);
 }

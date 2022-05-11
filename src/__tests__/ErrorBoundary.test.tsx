@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { ErrorBoundary } from '../ErrorBoundary';
 import type { BugSplat, BugSplatOptions, BugSplatResponse } from 'bugsplat';
-import { setBugSplatStore, updateBugSplatStore } from '../core/global';
+import { setBugSplat } from '../core/store';
 
 const mockPost = jest.fn(
   async (_errorToPost: string | Error, _options?: BugSplatOptions) =>
@@ -71,18 +71,13 @@ describe('<ErrorBoundary />', () => {
 
     describe('when BugSplat has been initialized', () => {
       beforeEach(() => {
-        updateBugSplatStore({
-          instance: {
-            post: mockPost,
-          } as unknown as BugSplat,
-        });
+        setBugSplat({
+          post: mockPost,
+        } as unknown as BugSplat);
       });
 
       afterEach(() => {
-        setBugSplatStore({
-          instance: undefined,
-          logger: console,
-        });
+        setBugSplat();
       });
 
       it('should call onError', async () => {

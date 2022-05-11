@@ -17,7 +17,7 @@
     "bugsplat",
     "react"
   ],
-  "author": "zmriel",
+  "author": "zmrl",
   "license": "ISC",
   "dependencies": {
     "bugsplat": "^7.1.3"
