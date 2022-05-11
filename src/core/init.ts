@@ -26,7 +26,7 @@ export interface BugSplatInit {
 }
 
 /**
- * Initialize BugSplat instance and attach it to a root object;
+ * Initialize BugSplat instance and set it in the store;
  */
 export function init({
   database,
@@ -36,17 +36,19 @@ export function init({
 }: BugSplatInit) {
   const instance = new BugSplat(database, application, version);
 
-  if (defaults.appKey) {
-    instance.setDefaultAppKey(defaults.appKey);
+  const { appKey, description, email, user } = defaults;
+
+  if (appKey) {
+    instance.setDefaultAppKey(appKey);
   }
-  if (defaults.description) {
-    instance.setDefaultDescription(defaults.description);
+  if (description) {
+    instance.setDefaultDescription(description);
   }
-  if (defaults.email) {
-    instance.setDefaultEmail(defaults.email);
+  if (email) {
+    instance.setDefaultEmail(email);
   }
-  if (defaults.user) {
-    instance.setDefaultUser(defaults.user);
+  if (user) {
+    instance.setDefaultUser(user);
   }
 
   setBugSplat(instance);
