@@ -3,15 +3,15 @@ import { useState } from 'react';
 /**
  * Utility hook to declaratively or imperatively propagate an
  * error to the nearest error boundary.
- * *Should only be called from a child of ErrorBoundary*
  *
- * * Pass an error prop to declaratively propagate errors
- * when its value is truthy
+ * *Should be called from a child of ErrorBoundary*
  *
- * * Call the returned handler with a truthy value to
- * imperatively propagate errors
+ * Propagate error:
  *
- * @param errorProp - Declarative error prop that will throw when it is truthy
+ * * Declaratively - by passing an error prop
+ * * Imperatively - by calling the returned handler with an error
+ *
+ * @param errorProp - Will throw when a truthy value is passed
  */
 export default function useErrorHandler(
   errorProp?: unknown
