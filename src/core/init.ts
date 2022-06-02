@@ -1,5 +1,5 @@
 import { BugSplat } from 'bugsplat';
-import { setBugSplat } from './store';
+import { setBugSplat } from './global-store';
 
 export interface BugSplatInit {
   /**
@@ -15,9 +15,9 @@ export interface BugSplatInit {
    */
   version: string;
   /**
-   * Sets default properties to be sent with crashes
+   * Sets default property values to be sent with crashes
    */
-  defaults?: {
+  defaultProps?: {
     appKey?: string;
     description?: string;
     email?: string;
@@ -32,11 +32,20 @@ export function init({
   database,
   application,
   version,
-  defaults = {},
+  defaultProps = {},
 }: BugSplatInit) {
   const instance = new BugSplat(database, application, version);
 
-  const { appKey, description, email, user } = defaults;
+  setBugSplat(instance);
+
+  setDefaultProps(instance, defaultProps);
+}
+
+function setDefaultProps(
+  instance: BugSplat,
+  defaultProps: BugSplatInit['defaultProps'] = {}
+) {
+  const { appKey, description, email, user } = defaultProps;
 
   if (appKey) {
     instance.setDefaultAppKey(appKey);
@@ -50,6 +59,4 @@ export function init({
   if (user) {
     instance.setDefaultUser(user);
   }
-
-  setBugSplat(instance);
 }

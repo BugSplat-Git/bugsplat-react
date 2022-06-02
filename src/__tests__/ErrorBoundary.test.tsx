@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { ErrorBoundary } from '../ErrorBoundary';
 import type { BugSplat, BugSplatOptions, BugSplatResponse } from 'bugsplat';
-import { setBugSplat } from '../core/store';
+import { setBugSplat } from '../core/global-store';
 
 const mockPost = jest.fn(
   async (_errorToPost: string | Error, _options?: BugSplatOptions) =>
