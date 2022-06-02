@@ -17,5 +17,5 @@
     "strict": true,
     "target": "ES6"
   },
-  "include": ["src"]
+  "include": ["src", "src/__integration_tests__"]
 }
