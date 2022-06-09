@@ -6,8 +6,9 @@ import {
 import { render, waitFor, screen } from '@testing-library/react';
 import { BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
-import { getBugSplat, init } from '../core';
+import { BugSplatScope, createScope } from '../scope';
 import ErrorBoundary from '../ErrorBoundary';
+import MockBugSplat from '../__mocks__/MockBugSplat';
 
 const email = 'fred@bugsplat.com';
 // const password = process.env.FRED_PASSWORD;
@@ -22,6 +23,7 @@ function BlowUp(): JSX.Element {
 
 describe('<ErrorBoundary />', () => {
   let client: CrashApiClient;
+  let scope: BugSplatScope;
 
   beforeEach(async () => {
     if (!password) {
@@ -30,6 +32,7 @@ describe('<ErrorBoundary />', () => {
     const apiClient = new BugSplatApiClient(appBaseUrl, Environment.Node);
     await apiClient.login(email, password);
     client = new CrashApiClient(apiClient);
+    scope = createScope(MockBugSplat);
   });
 
   it('should post a crash report with all the provided information', async () => {
@@ -41,19 +44,19 @@ describe('<ErrorBoundary />', () => {
     const email = 'fred@bedrock.com';
     const description = 'Description!';
 
-    init({
+    scope.init({
       database,
       application,
       version,
-      defaultProps: {
-        appKey,
-        user,
-        email,
-        description,
+      onInit: (bugSplat) => {
+        bugSplat.setDefaultAppKey(appKey);
+        bugSplat.setDefaultUser(user);
+        bugSplat.setDefaultEmail(email);
+        bugSplat.setDefaultDescription(description);
       },
     });
 
-    const bugSplat = getBugSplat() as unknown as {
+    const bugSplat = scope.getInstance() as unknown as {
       _formData: () => FormData;
       _fetch: typeof fetch;
     };

@@ -8,7 +8,7 @@
     "src"
   ],
   "scripts": {
-    "test": "jest --testPathIgnorePatterns=__integration_tests__/",
+    "test": "jest --testPathIgnorePatterns=/src/__integration_tests__/",
     "test:integration": "jest src/__integration_tests__/",
     "build": "tsc",
     "prepare": "npm run build",

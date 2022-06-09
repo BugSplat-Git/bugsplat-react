@@ -7,7 +7,7 @@ import {
   ReactElement,
   ReactNode,
 } from 'react';
-import { getBugSplat } from './core';
+import defaultScope from './defaultScope';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -25,7 +25,7 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
 }
 
 /**
- * Packs a component stack string into an expected object shape
+ * Pack a component stack trace string into an expected object shape
  */
 function packComponentStack(componentStack: string): FormDataParam {
   return {
@@ -118,6 +118,7 @@ export interface ErrorBoundaryProps {
    * posted to BugSplat.
    */
   skipPost?: boolean;
+  scope?: { getInstance(): BugSplat | null };
   children?: ReactNode | ReactNode[];
 }
 
@@ -169,9 +170,9 @@ export class ErrorBoundary extends Component<
   }
 
   async handleError(error: Error, { componentStack }: ErrorInfo) {
-    const { onError, beforePost, skipPost } = this.props;
+    const { onError, beforePost, skipPost, scope = defaultScope } = this.props;
 
-    const bugSplat = getBugSplat();
+    const bugSplat = scope.getInstance();
     let response: BugSplatResponse | null = null;
 
     if (bugSplat && !skipPost) {

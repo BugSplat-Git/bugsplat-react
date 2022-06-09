@@ -1,13 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { ErrorBoundary } from '../ErrorBoundary';
-import type { BugSplat, BugSplatOptions, BugSplatResponse } from 'bugsplat';
-import { setBugSplat } from '../core/global-store';
-
-const mockPost = jest.fn(
-  async (_errorToPost: string | Error, _options?: BugSplatOptions) =>
-    new Promise<BugSplatResponse>(() => ({}))
-);
+import { BugSplatScope, createScope } from '../scope';
+import MockBugSplat, { mockPost } from '../__mocks__/MockBugSplat';
 
 const BlowUpError = new Error('Error thrown during render.');
 
@@ -16,7 +11,7 @@ function BlowUp(): JSX.Element {
 }
 
 beforeEach(() => {
-  mockPost.mockReset();
+  mockPost.mockClear();
 });
 
 describe('<ErrorBoundary />', () => {
@@ -70,20 +65,21 @@ describe('<ErrorBoundary />', () => {
     });
 
     describe('when BugSplat has been initialized', () => {
-      beforeEach(() => {
-        setBugSplat({
-          post: mockPost,
-        } as unknown as BugSplat);
-      });
+      let scope: BugSplatScope;
 
-      afterEach(() => {
-        setBugSplat();
+      beforeEach(() => {
+        scope = createScope(MockBugSplat);
+        scope.init({
+          database: 'db1',
+          application: 'this app',
+          version: '3.2.1',
+        });
       });
 
       it('should call onError', async () => {
         const mockOnError = jest.fn();
         render(
-          <ErrorBoundary onError={mockOnError}>
+          <ErrorBoundary onError={mockOnError} scope={scope}>
             <BlowUp />
           </ErrorBoundary>
         );
@@ -94,7 +90,7 @@ describe('<ErrorBoundary />', () => {
       it('should not post if skipPost is set to true', () => {
         const mockBeforePost = jest.fn();
         render(
-          <ErrorBoundary skipPost beforePost={mockBeforePost}>
+          <ErrorBoundary skipPost beforePost={mockBeforePost} scope={scope}>
             <BlowUp />
           </ErrorBoundary>
         );
@@ -105,7 +101,7 @@ describe('<ErrorBoundary />', () => {
 
       it('should call BugSplat.post', () => {
         render(
-          <ErrorBoundary>
+          <ErrorBoundary scope={scope}>
             <BlowUp />
           </ErrorBoundary>
         );
@@ -116,7 +112,7 @@ describe('<ErrorBoundary />', () => {
       it('should call beforePost', () => {
         const mockBeforePost = jest.fn();
         render(
-          <ErrorBoundary beforePost={mockBeforePost}>
+          <ErrorBoundary beforePost={mockBeforePost} scope={scope}>
             <BlowUp />
           </ErrorBoundary>
         );
