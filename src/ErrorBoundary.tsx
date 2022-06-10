@@ -7,7 +7,7 @@ import {
   ReactElement,
   ReactNode,
 } from 'react';
-import defaultScope from './defaultScope';
+import BugSplatScope from './BugSplatScope';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -170,7 +170,7 @@ export class ErrorBoundary extends Component<
   }
 
   async handleError(error: Error, { componentStack }: ErrorInfo) {
-    const { onError, beforePost, skipPost, scope = defaultScope } = this.props;
+    const { onError, beforePost, skipPost, scope = BugSplatScope } = this.props;
 
     const bugSplat = scope.getInstance();
     let response: BugSplatResponse | null = null;

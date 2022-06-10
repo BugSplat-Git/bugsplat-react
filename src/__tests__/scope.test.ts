@@ -1,8 +1,10 @@
-import { createScope, BugSplatScope, BugSplatInit } from '../scope';
+import { BugSplat } from 'bugsplat';
+import { BugSplatInit } from '../BugSplatScope';
+import { Scope } from '../scope';
 import MockBugSplat, { mockPost } from '../__mocks__/MockBugSplat';
 
-describe('createScope()', () => {
-  let scope: BugSplatScope;
+describe('Scope', () => {
+  let scope: Scope<BugSplat, BugSplatInit>;
 
   const fakeInit: BugSplatInit = {
     database: 'db1',
@@ -13,7 +15,11 @@ describe('createScope()', () => {
   beforeEach(() => {
     mockPost.mockClear();
     MockBugSplat.mockClear();
-    scope = createScope(MockBugSplat);
+
+    scope = new Scope(
+      ({ database, application, version }: BugSplatInit) =>
+        new MockBugSplat(database, application, version)
+    );
   });
 
   describe('.init()', () => {
@@ -34,37 +40,27 @@ describe('createScope()', () => {
     it('should return an instance after init()', () => {
       scope.init(fakeInit);
 
-      expect(scope.getInstance()).not.toBeNull();
+      expect(scope.getInstance()).toBe(MockBugSplat.mock.instances.at(-1));
     });
 
-    it('should return null after reset()', () => {
+    it('should return null after clearInstance()', () => {
       scope.init(fakeInit);
 
       expect(scope.getInstance()).not.toBeNull();
 
-      scope.reset();
+      scope.clearInstance();
 
       expect(scope.getInstance()).toBeNull();
     });
   });
 
-  describe('.post()', () => {
-    it('should call BugSplat.post with args', async () => {
-      expect.assertions(1);
-
+  describe('.useInstance()', () => {
+    it('should call action with stored instance', () => {
       scope.init(fakeInit);
 
-      await scope.post('test-me');
-
-      expect(mockPost).toHaveBeenCalledWith('test-me');
-    });
-
-    it('should throw Error if scope is not initialized', async () => {
-      try {
-        await scope.post('');
-      } catch (err) {
-        expect(err).toBeInstanceOf(Error);
-      }
+      scope.useInstance((instance) => {
+        expect(instance).toBe(scope.getInstance());
+      });
     });
   });
 });

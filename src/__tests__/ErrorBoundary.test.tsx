@@ -1,7 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { BugSplat } from 'bugsplat';
 import { useState } from 'react';
+import { BugSplatInit } from '../BugSplatScope';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { BugSplatScope, createScope } from '../scope';
+import { Scope } from '../scope';
 import MockBugSplat, { mockPost } from '../__mocks__/MockBugSplat';
 
 const BlowUpError = new Error('Error thrown during render.');
@@ -65,10 +67,15 @@ describe('<ErrorBoundary />', () => {
     });
 
     describe('when BugSplat has been initialized', () => {
-      let scope: BugSplatScope;
+      let scope: Scope<BugSplat, BugSplatInit>;
 
       beforeEach(() => {
-        scope = createScope(MockBugSplat);
+        scope = new Scope(
+          ({ database, application, version }: BugSplatInit) => {
+            return new MockBugSplat(database, application, version);
+          }
+        );
+
         scope.init({
           database: 'db1',
           application: 'this app',

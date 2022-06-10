@@ -5,8 +5,13 @@ export const mockPost = jest.fn(
     new Promise<BugSplatResponse>((resolve) => resolve({} as BugSplatResponse))
 );
 
-const MockBugSplat = jest.fn(function () {
-  return { post: mockPost };
-}) as unknown as jest.MockedClass<typeof BugSplat>;
+const MockBugSplat = jest.fn(function (
+  this: BugSplat,
+  ..._args: ConstructorParameters<typeof BugSplat>
+) {
+  this.post = mockPost;
+
+  return this;
+});
 
 export default MockBugSplat;
