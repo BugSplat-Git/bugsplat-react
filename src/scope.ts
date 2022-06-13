@@ -1,37 +1,36 @@
-export class Scope<Type, Options> {
-  private instance: Type | null = null;
-  private initialize: (options: Options) => Type;
+/**
+ * Create a scope container for managing a shared instance
+ */
+export function createScope<Type>(): Scope<Type> {
+  let instance: Type | null = null;
 
-  /**
-   * @param initialize - Function to initialize a fresh instance
-   */
-  constructor(initialize: (options: Options) => Type) {
-    this.initialize = initialize;
-  }
+  return {
+    setInstance(value) {
+      instance = value;
+    },
 
-  /**
-   * Initialize instance and store it internally;
-   */
-  init(options: Options) {
-    this.instance = this.initialize(options);
+    getInstance() {
+      return instance;
+    },
 
-    return this;
-  }
+    useInstance(action) {
+      action(instance);
+    },
+  };
+}
 
+/**
+ * Scope container for shared instance management
+ */
+export interface Scope<Type> {
   /**
    * @returns scoped instance or `null` if one isn't set.
    */
-  getInstance() {
-    return this.instance;
-  }
-
+  getInstance: () => Type | null;
   /**
-   * Remove reference to scoped instance
+   * Set scoped instance
    */
-  clearInstance() {
-    this.instance = null;
-  }
-
+  setInstance: (value: Type | null) => void;
   /**
    * Perform an action using the instance
    *
@@ -43,9 +42,5 @@ export class Scope<Type, Options> {
    *   instance.setDefaultDescription('vivid description')
    * })
    */
-  useInstance(action: (instance: Type | null) => void) {
-    action(this.instance);
-
-    return this;
-  }
+  useInstance: (action: (instance: Type | null) => void) => void;
 }
