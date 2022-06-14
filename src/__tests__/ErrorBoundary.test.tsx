@@ -1,9 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BugSplat } from 'bugsplat';
 import { useState } from 'react';
-import { BugSplatInit } from '../BugSplatScope';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { Scope } from '../scope';
+import { createScope, Scope } from '../scope';
 import MockBugSplat, { mockPost } from '../__mocks__/MockBugSplat';
 
 const BlowUpError = new Error('Error thrown during render.');
@@ -67,20 +66,11 @@ describe('<ErrorBoundary />', () => {
     });
 
     describe('when BugSplat has been initialized', () => {
-      let scope: Scope<BugSplat, BugSplatInit>;
+      let scope: Scope<BugSplat>;
 
       beforeEach(() => {
-        scope = new Scope(
-          ({ database, application, version }: BugSplatInit) => {
-            return new MockBugSplat(database, application, version);
-          }
-        );
-
-        scope.init({
-          database: 'db1',
-          application: 'this app',
-          version: '3.2.1',
-        });
+        scope = createScope();
+        scope.setInstance(new MockBugSplat('db1', 'this app', '3.2.1'));
       });
 
       it('should call onError', async () => {
@@ -97,7 +87,7 @@ describe('<ErrorBoundary />', () => {
       it('should not post if skipPost is set to true', () => {
         const mockBeforePost = jest.fn();
         render(
-          <ErrorBoundary skipPost beforePost={mockBeforePost} scope={scope}>
+          <ErrorBoundary disablePost beforePost={mockBeforePost} scope={scope}>
             <BlowUp />
           </ErrorBoundary>
         );

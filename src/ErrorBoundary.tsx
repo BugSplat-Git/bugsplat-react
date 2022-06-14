@@ -49,35 +49,39 @@ export type FallbackElement = ReactElement<
 
 export type FallbackRender = (props: FallbackProps) => FallbackElement;
 
-export interface ErrorBoundaryProps {
+interface InternalErrorBoundaryProps {
   /**
    * Callback called before error post to BugSplat.
    */
-  beforePost?: (
+  beforePost: (
     bugSplat: BugSplat,
     error: Error | null,
     componentStack: string | null
   ) => void;
+
   /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
    */
-  onError?: (
+  onError: (
     error: Error,
     componentStack: string,
     response: BugSplatResponse | null
   ) => void;
+
   /**
    * Callback called on componentDidMount().
    */
-  onMount?: () => void;
+  onMount: () => void;
+
   /**
    * Callback called on componentWillUnmount().
    */
-  onUnmount?: (
+  onUnmount: (
     error: Error | null,
     componentStack: string | null,
     response: BugSplatResponse | null
   ) => void;
+
   /**
    * Callback called before ErrorBoundary resets internal state,
    * resulting in rendering children again. This should be
@@ -87,25 +91,25 @@ export interface ErrorBoundaryProps {
    * *Not called when reset from change in resetKeys -
    * use onResetKeysChange for that.*
    */
-  onReset?: (
+  onReset: (
     error: Error | null,
     componentStack: string | null,
     response: BugSplatResponse | null,
     extraArgs?: unknown[]
   ) => void;
+
   /**
    * Callback called when keys passed to resetKeys are changed.
    */
-  onResetKeysChange?: (
-    prevResetKeys?: unknown[],
-    resetKeys?: unknown[]
-  ) => void;
+  onResetKeysChange: (prevResetKeys?: unknown[], resetKeys?: unknown[]) => void;
+
   /**
    * Array of values passed from parent scope. When ErrorBoundary
    * is in an error state, it will check each passed value
    * and automatically reset if any of the values have changed.
    */
   resetKeys?: unknown[];
+
   /**
    * Provide a fallback to render when ErrorBoundary catches an error.
    * Not required, but it is highly recommended to provide a value for this.
@@ -113,14 +117,27 @@ export interface ErrorBoundaryProps {
    * This can be an element or a function that renders an element.
    */
   fallback?: FallbackElement | FallbackRender;
+
   /**
-   * If true, caught errors will not be automatically
-   * posted to BugSplat.
+   * If true, caught errors will not be automatically posted to BugSplat.
    */
-  skipPost?: boolean;
-  scope?: { getInstance(): BugSplat | null };
+  disablePost?: boolean;
+
+  /**
+   * Child elements to be rendered when there is no error
+   */
   children?: ReactNode | ReactNode[];
+
+  /**
+   * Scope container for the BugSplat instance that is used to post errors
+   */
+  scope: { getInstance(): BugSplat | null };
 }
+
+export type ErrorBoundaryProps = JSX.LibraryManagedAttributes<
+  typeof ErrorBoundary,
+  InternalErrorBoundaryProps
+>;
 
 export interface ErrorBoundaryState {
   /**
@@ -144,54 +161,43 @@ const INITIAL_STATE: ErrorBoundaryState = {
 };
 
 /**
+ * Empty function that does nothing
+ *
+ * Useful as a placeholder
+ */
+function noop(..._args: unknown[]) {
+  // this comment allows empty function
+}
+
+/**
  * Handle errors that occur during rendering by wrapping
  * your component tree with ErrorBoundary. Any number of ErrorBoundary
  * components can be rendered in the tree and any rendering error will
  * propagate to the nearest one.
  */
 export class ErrorBoundary extends Component<
-  ErrorBoundaryProps,
+  InternalErrorBoundaryProps,
   ErrorBoundaryState
 > {
   static getDerivedStateFromError(error: Error) {
     return { error };
   }
 
-  state = INITIAL_STATE;
-
-  resetErrorBoundary = (...args: unknown[]) => {
-    const { error, componentStack, response } = this.state;
-    this.props.onReset?.(error, componentStack, response, args);
-    this.reset();
+  static defaultProps: InternalErrorBoundaryProps = {
+    beforePost: noop,
+    onError: noop,
+    onMount: noop,
+    onReset: noop,
+    onResetKeysChange: noop,
+    onUnmount: noop,
+    disablePost: false,
+    scope: BugSplatScope,
   };
 
-  reset() {
-    this.setState(INITIAL_STATE);
-  }
+  state = INITIAL_STATE;
 
-  async handleError(error: Error, { componentStack }: ErrorInfo) {
-    const { onError, beforePost, skipPost, scope = BugSplatScope } = this.props;
-
-    const bugSplat = scope.getInstance();
-    let response: BugSplatResponse | null = null;
-
-    if (bugSplat && !skipPost) {
-      beforePost?.(bugSplat, error, componentStack);
-      try {
-        response = await bugSplat.post(error, {
-          additionalFormDataParams: [packComponentStack(componentStack)],
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    onError?.(error, componentStack, response);
-    this.setState({ error, componentStack, response });
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.handleError(error, errorInfo).catch(console.error);
+  componentDidMount() {
+    this.props.onMount?.();
   }
 
   componentDidUpdate(
@@ -211,13 +217,44 @@ export class ErrorBoundary extends Component<
     }
   }
 
-  componentDidMount() {
-    this.props.onMount?.();
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    this.handleError(error, errorInfo).catch(console.error);
   }
 
   componentWillUnmount() {
     const { error, componentStack, response } = this.state;
     this.props.onUnmount?.(error, componentStack, response);
+  }
+
+  async handleError(error: Error, { componentStack }: ErrorInfo) {
+    const { onError, beforePost, disablePost, scope } = this.props;
+
+    const bugSplat = scope.getInstance();
+    let response: BugSplatResponse | null = null;
+
+    if (bugSplat && !disablePost) {
+      beforePost?.(bugSplat, error, componentStack);
+      try {
+        response = await bugSplat.post(error, {
+          additionalFormDataParams: [packComponentStack(componentStack)],
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    onError?.(error, componentStack, response);
+    this.setState({ error, componentStack, response });
+  }
+
+  resetErrorBoundary = (...args: unknown[]) => {
+    const { error, componentStack, response } = this.state;
+    this.props.onReset?.(error, componentStack, response, args);
+    this.reset();
+  };
+
+  reset() {
+    this.setState(INITIAL_STATE);
   }
 
   render() {

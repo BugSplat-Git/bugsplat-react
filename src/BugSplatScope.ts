@@ -1,5 +1,5 @@
 import { BugSplat } from 'bugsplat';
-import { Scope } from './scope';
+import { createScope, Scope } from './scope';
 
 export interface BugSplatInit {
   /**
@@ -14,22 +14,28 @@ export interface BugSplatInit {
    * Version of application.
    */
   version: string;
-}
-
-export function createBugSplatScope() {
-  return new Scope(({ database, application, version }: BugSplatInit) => {
-    return new BugSplat(database, application, version);
-  });
+  /**
+   * Container for BugSplat client instance
+   */
+  scope?: Scope<BugSplat>;
 }
 
 /**
- * Default scope for managing shared `BugSplat` instance
+ * Container for managing shared `BugSplat` instance
  */
-const BugSplatScope = createBugSplatScope();
+const BugSplatScope = createScope<BugSplat>();
 
-export const init = BugSplatScope.init.bind(BugSplatScope);
-export const useInstance = BugSplatScope.useInstance.bind(BugSplatScope);
-export const getInstance = BugSplatScope.getInstance.bind(BugSplatScope);
-export const clearInstance = BugSplatScope.clearInstance.bind(BugSplatScope);
+export function init({
+  database,
+  application,
+  version,
+  scope = BugSplatScope,
+}: BugSplatInit) {
+  const bugSplat = new BugSplat(database, application, version);
+
+  scope.setInstance(bugSplat);
+}
+
+export const getBugSplat = BugSplatScope.getInstance;
 
 export default BugSplatScope;

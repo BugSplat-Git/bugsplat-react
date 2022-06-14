@@ -4,15 +4,13 @@ import {
   Environment,
 } from '@bugsplat/js-api-client';
 import { render, waitFor, screen } from '@testing-library/react';
-import { BugSplatResponse } from 'bugsplat';
+import { BugSplat, BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
-import { BugSplatScope, createScope } from '../scope';
+import { createScope } from '../scope';
 import ErrorBoundary from '../ErrorBoundary';
-import MockBugSplat from '../__mocks__/MockBugSplat';
 
 const email = 'fred@bugsplat.com';
-// const password = process.env.FRED_PASSWORD;
-const password = 'Flintstone';
+const password = process.env.FRED_PASSWORD;
 const appBaseUrl = 'https://app.bugsplat.com';
 
 const BlowUpError = new Error('Error thrown during render.');
@@ -23,7 +21,6 @@ function BlowUp(): JSX.Element {
 
 describe('<ErrorBoundary />', () => {
   let client: CrashApiClient;
-  let scope: BugSplatScope;
 
   beforeEach(async () => {
     if (!password) {
@@ -32,7 +29,6 @@ describe('<ErrorBoundary />', () => {
     const apiClient = new BugSplatApiClient(appBaseUrl, Environment.Node);
     await apiClient.login(email, password);
     client = new CrashApiClient(apiClient);
-    scope = createScope(MockBugSplat);
   });
 
   it('should post a crash report with all the provided information', async () => {
@@ -44,25 +40,16 @@ describe('<ErrorBoundary />', () => {
     const email = 'fred@bedrock.com';
     const description = 'Description!';
 
-    scope.init({
-      database,
-      application,
-      version,
-      onInit: (bugSplat) => {
-        bugSplat.setDefaultAppKey(appKey);
-        bugSplat.setDefaultUser(user);
-        bugSplat.setDefaultEmail(email);
-        bugSplat.setDefaultDescription(description);
-      },
-    });
+    const bugSplat = new BugSplat(database, application, version);
+    const scope = createScope(bugSplat);
 
-    const bugSplat = scope.getInstance() as unknown as {
-      _formData: () => FormData;
-      _fetch: typeof fetch;
-    };
+    bugSplat.setDefaultAppKey(appKey);
+    bugSplat.setDefaultUser(user);
+    bugSplat.setDefaultEmail(email);
+    bugSplat.setDefaultDescription(description);
 
-    bugSplat._formData = () => new globalThis.FormData();
-    bugSplat._fetch = globalThis.fetch;
+    bugSplat['_formData'] = () => new globalThis.FormData();
+    bugSplat['_fetch'] = globalThis.fetch;
 
     let result: BugSplatResponse | null;
 
@@ -76,6 +63,7 @@ describe('<ErrorBoundary />', () => {
             {(response?.response as BugSplatResponseBody)?.crash_id}
           </div>
         )}
+        scope={scope}
       >
         <BlowUp />
       </ErrorBoundary>
