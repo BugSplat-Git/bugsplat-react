@@ -1,56 +1,83 @@
-# [![BugSplat](https://s3.amazonaws.com/bugsplat-public/npm/header.png)](https://www.bugsplat.com)
+<h1 align="center">
+  <a href="">
+    <img src="https://s3.amazonaws.com/bugsplat-public/npm/header.png" alt="BugSplat">
+  </a>  
+</h1>
+
+<h2 align="center">
+  bugsplat-react
+</h2>
 
 ## Introduction
 
-BugSplat supports the collection of errors in React applications. The bugsplat-react npm package implements an [ErrorBoundary](https://reactjs.org/docs/error-boundaries.html) component in order to capture rendering errors in child components and post them to BugSplat where they can be tracked and managed. The package also includes a [React context](https://reactjs.org/docs/context.html) provider and additional utilities to tailor BugSplat to the needs of your application. Adding BugSplat to your React application is extremely easy. Before getting started please complete the following tasks:
+BugSplat supports the collection of errors in React applications. The
+bugsplat-react npm package implements an
+[ErrorBoundary](https://reactjs.org/docs/error-boundaries.html)
+component in order to capture rendering errors in child components and
+post them to BugSplat where they can be tracked and managed. The package
+also includes a [React context](https://reactjs.org/docs/context.html)
+provider and additional utilities to tailor BugSplat to the needs of
+your application. Adding BugSplat to your React application is extremely
+easy. Before getting started please complete the following tasks:
 
 - [Sign up](https://app.bugsplat.com/v2/sign-up) for BugSplat
-- Create a new [database](https://app.bugsplat.com/v2/settings/company/databases) for your application
-- Check out the [live demo](https://www.bugsplat.com/platforms/react/my-react-crasher) of BugSplat’s error reporting for React
+- Create a new
+  [database](https://app.bugsplat.com/v2/settings/company/databases)
+  for your application
+- Check out the
+  [live demo](https://www.bugsplat.com/platforms/react/my-react-crasher)
+  of BugSplat’s error reporting for React
 
 ## Get Started
 
-To start using BugSplat in your React application, run the following command at the root of your project. This will install bugsplat-react and its sub dependency [bugsplat](https://github.com/BugSplat-Git/bugsplat-js).
+To start using BugSplat in your React application, run the following command
+at the root of your project. This will install bugsplat-react and its sub
+dependency [bugsplat](https://github.com/BugSplat-Git/bugsplat-js).
 
 ```shell
 npm i bugsplat-react --save
 ```
 
-In addition to standard `package.json` properties `name` and `version`, include a `database` property to your `package.json` file with the value of your BugSplat database. Make sure to replace {{database}} with your actual database name.
+In addition to standard `package.json` properties `name` and `version`, include
+a `database` property to your `package.json` file with the value of your BugSplat
+database. Make sure to replace `{{YOUR_DATABASE_NAME}}` with your actual
+database name.
 
-```json
+```jsonc
+// package.json
 {
   "name": "my-app",
   "version": "1.2.0",
-  "database": "{{database}}"
+  "database": "{{YOUR_DATABASE_NAME}}"
+  // ...
 }
 ```
 
-In the root of your project, import data from your `package.json` and initialize a new `BugSplat` instance with it. Pass your newly created `BugSplat` instance to the `BugSplatProvider` at the root of your app in order to share it with all child components.
+In the root of your project, import `init` from `bugsplat-react` and
+`package.json` locally. Use it's `name`, `database`, and `version` properties
+to initialize the BugSplat client for sending crashes. This will instantiate
+a new client instance and store it internally.
 
 ```jsx
 // src/index.tsx
 
 import ReactDOM from 'react-dom';
-import { BugSplat, BugSplatProvider } from 'bugsplat-react';
+import { init } from 'bugsplat-react';
 import App from './App';
 import * as packageJson from '../package.json';
 
-const bugsplat = new BugSplat(
-  packageJson.database,
-  packageJson.name,
-  packageJson.version
-);
+init({
+  database: packageJson.database,
+  name: packageJson.name,
+  version: packageJson.version,
+});
 
-ReactDOM.render(
-  <BugSplatProvider value={bugsplat}>
-    <App />
-  </BugSplatProvider>,
-  document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById('root'));
 ```
 
-With this provider, you are supplying the `BugSplat` instance to your application components through [React context](https://reactjs.org/docs/context.html). You can now wrap your component trees with `ErrorBoundary` to capture rendering errors and automatically post them to BugSplat with the instance you passed to `BugSplatProvider`.
+You can now wrap your component trees with `ErrorBoundary` to capture rendering
+errors and automatically post them to BugSplat with the internal client
+instance we initialized earlier.
 
 ```jsx
 // src/App.tsx
@@ -66,22 +93,23 @@ export default function App() {
 }
 ```
 
-You can also access the provided `BugSplat` instance in any child function component with the `useBugSplat` hook.
+You can also access the stored `BugSplat` instance anywhere by
+calling `getBugSplat()`
 
 ```jsx
 // src/App.tsx
 
-import { useBugSplat } from 'bugsplat-react';
+import { getBugSplat } from 'bugsplat-react';
 
 export default function App() {
-  const bugSplat = useBugSplat();
+  const handleClick = () => {
+    getBugSplat().post('There was a problem');
+  };
 
   return (
     <div>
       <h1>Hello, world!</h1>
-      <button onClick={() => bugSplat.post('There was a problem')}>
-        Post Error Report
-      </button>
+      <button onClick={handleClick}>Post Error Report</button>
     </div>
   );
 }
@@ -89,7 +117,12 @@ export default function App() {
 
 ## Further Integration
 
-Want your error boundary to also handle errors that are not caught by `ErrorBoundary`, such as async errors or event handlers? No problem! `useErrorHandler` to the rescue. Pass your error to the callback returned from `useErrorHandler` in order to propagate the error to the nearest `ErrorBoundary`. You can also pass your error directly to `useErrorHandler` if you manage the error state yourself or get it from another library.
+Want your error boundary to also handle errors that are not caught by
+`ErrorBoundary`, such as async errors or event handlers? No problem!
+`useErrorHandler` to the rescue. Pass your error to the callback returned from
+`useErrorHandler` in order to propagate the error to the nearest
+`ErrorBoundary`. You can also pass your error directly to `useErrorHandler`
+if you manage the error state yourself or get it from another library.
 
 ```jsx
 // src/App.tsx
@@ -137,23 +170,11 @@ export default function App() {
 }
 ```
 
-In it's simplest form, the `ErrorBoundary` component catches rendering errors in child components and can be used without integrating BugSplat. To utilize the full power of `ErrorBoundary`, pass a `BugSplat` instance through a parent `BugSplatProvider` or with the `bugSplat` prop. If both `BugSplatProvider` and the `bugSplat` prop are provided, the prop will take preference over the context value.
+Providing an instance of BugSplat will allow `ErrorBoundary` to automatically
+post errors it catches to BugSplat.
 
-```jsx
-function Component() {
-  return (
-    <BugSplatProvider value={bugSplat}>
-      <ErrorBoundary bugSplat={bugSplat}>
-        <ChildComponent />
-      </ErrorBoundary>
-    </BugSplatProvider>
-  );
-}
-```
-
-Providing an instance of BugSplat will allow `ErrorBoundary` to automatically post errors it catches to BugSplat.
-
-The `ErrorBoundary` component is packed with props that can be used to customize it to fit your needs:
+The `ErrorBoundary` component is packed with props that can be used to
+customize it to fit your needs:
 
 - `fallback`
 - `onMount`
@@ -162,8 +183,10 @@ The `ErrorBoundary` component is packed with props that can be used to customize
 - `beforePost`
 - `onReset`
 - `onResetKeysChange`
+- `disablePost`
 
-We strongly recommend passing a `fallback` prop that will be rendered when `ErrorBoundary` encounters an error.
+We strongly recommend passing a `fallback` prop that will be rendered
+when `ErrorBoundary` encounters an error.
 
 The `fallback` prop can be any valid element:
 
@@ -194,11 +217,17 @@ If `fallback` is a function, it will be called with
 - `error` - the error caught be `ErrorBoundary`
 - `componentStack` - the component stack trace of the error
 - `response` - the BugSplat response of posting error to BugSplat, if applicable
-- `resetErrorBoundary` - a function to call in order to reset the `ErrorBoundary` state
+- `resetErrorBoundary` - a function to call in order to reset the
+  `ErrorBoundary` state
 
-The fallback will render any time the `ErrorBoundary` catches an error. It is useful to have a fallback UI to gracefully handle errors for your users, while still sending errors to BugSplat behind the scenes.
+The fallback will render any time the `ErrorBoundary` catches an error. It is
+useful to have a fallback UI to gracefully handle errors for your users, while
+still sending errors to BugSplat behind the scenes.
 
-`ErrorBoundary` accepts a `resetKeys` prop that you can pass with an array of values that will cause it to automatically reset if one of those values changes. This gives you the power to control the error state from outside of the component.
+`ErrorBoundary` accepts a `resetKeys` prop that you can pass with an array of
+values that will cause it to automatically reset if one of those values changes.
+This gives you the power to control the error state from outside of the
+component.
 
 ```jsx
 function App() {
@@ -218,44 +247,8 @@ function App() {
 
 ## API
 
-This package re-exports all exports from [bugsplat-js](https://github.com/BugSplat-Git/bugsplat-js).
-
-### `BugSplatContext`
-
-```typescript
-const BugSplatContext: React.Context<BugSplat | null>;
-
-interface BugSplatProviderProps {
-  /**
-   * BugSplat instance
-   *
-   * *Should be memoized or created outside of
-   * render to preserve referential integrity*
-   */
-  value: BugSplat;
-  children: ReactNode;
-}
-
-/**
- * Provide BugSplat instance to children.
- */
-function BugSplatProvider(props: BugSplatProviderProps): JSX.Element;
-
-/**
- * Retrieve the BugSplat instance provided by a parent BugSplatProvider
- * @returns {BugSplat} BugSplat instance
- */
-function useBugSplat(): BugSplat | null;
-
-/**
- * Higher order component to inject BugSplat instance
- * into component props from context.
- */
-function withBugSplat<P extends { bugSplat?: BugSplat }>(
-  Component: React.ComponentType<P>,
-  bugSplat?: BugSplat
-): React.ComponentType<P>;
-```
+This package re-exports all exports from
+[bugsplat-js](https://github.com/BugSplat-Git/bugsplat-js).
 
 ### `ErrorBoundary`
 
@@ -276,10 +269,6 @@ type FallbackRender = (props: FallbackProps) => FallbackElement;
 
 interface ErrorBoundaryProps {
   /**
-   * BugSplat instance used to post errors.
-   */
-  bugSplat?: BugSplat;
-  /**
    * Callback called before error post to BugSplat.
    */
   beforePost?: (
@@ -287,6 +276,7 @@ interface ErrorBoundaryProps {
     error: Error | null,
     componentStack: string | null
   ) => void;
+
   /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
    */
@@ -295,10 +285,12 @@ interface ErrorBoundaryProps {
     componentStack: string,
     response: BugSplatResponse | null
   ) => void;
+
   /**
    * Callback called on componentDidMount().
    */
   onMount?: () => void;
+
   /**
    * Callback called on componentWillUnmount().
    */
@@ -307,10 +299,11 @@ interface ErrorBoundaryProps {
     componentStack: string | null,
     response: BugSplatResponse | null
   ) => void;
+
   /**
    * Callback called before ErrorBoundary resets internal state,
    * resulting in rendering children again. This should be
-   * used to ensure that re-rendering of children would not
+   * used to ensure that rerendering of children would not
    * repeat the same error that occurred.
    *
    * *Not called when reset from change in resetKeys -
@@ -322,19 +315,19 @@ interface ErrorBoundaryProps {
     response: BugSplatResponse | null,
     extraArgs?: unknown[]
   ) => void;
+
   /**
    * Callback called when keys passed to resetKeys are changed.
    */
-  onResetKeysChange?: (
-    prevResetKeys?: unknown[],
-    resetKeys?: unknown[]
-  ) => void;
+  onResetKeysChange?: (prevResetKeys?: unknown[], resetKeys?: unknown[]) => void;
+
   /**
    * Array of values passed from parent scope. When ErrorBoundary
    * is in an error state, it will check each passed value
    * and automatically reset if any of the values have changed.
    */
   resetKeys?: unknown[];
+
   /**
    * Provide a fallback to render when ErrorBoundary catches an error.
    * Not required, but it is highly recommended to provide a value for this.
@@ -342,11 +335,16 @@ interface ErrorBoundaryProps {
    * This can be an element or a function that renders an element.
    */
   fallback?: FallbackElement | FallbackRender;
+
   /**
-   * If true, caught errors will not be automatically
-   * posted to BugSplat.
+   * If true, caught errors will not be automatically posted to BugSplat.
    */
-  skipPost?: boolean;
+  disablePost?: boolean;
+
+  /**
+   * Child elements to be rendered when there is no error
+   */
+  children?: ReactNode | ReactNode[];
 }
 
 interface ErrorBoundaryState {
@@ -385,15 +383,15 @@ function withErrorBoundary<P extends Record<string, unknown>>(
 /**
  * Utility hook to declaratively or imperatively propagate an
  * error to the nearest error boundary.
- * *Should only be called from a child of ErrorBoundary*
  *
- * * Pass an error prop to declaratively propagate errors
- * when its value is truthy
+ * *Should be called from a child of ErrorBoundary*
  *
- * * Call the returned handler with a truthy value to
- * imperatively propagate errors
+ * Propagate error:
  *
- * @param errorProp - Declarative error prop that will throw when it is truthy
+ * * Declaratively - by passing an error prop
+ * * Imperatively - by calling the returned handler with an error
+ *
+ * @param errorProp - Will throw when a truthy value is passed
  */
 function useErrorHandler(errorProp?: unknown): (error: unknown) => void;
 ```
