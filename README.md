@@ -53,10 +53,9 @@ database name.
 }
 ```
 
-In the root of your project, import `init` from `bugsplat-react` and
-`package.json` locally. Use it's `name`, `database`, and `version` properties
-to initialize the BugSplat client for sending crashes. This will instantiate
-a new client instance and store it internally.
+In the root of your project, import your project's `package.json`. Use it's
+`name`, `database`, and `version` properties to initialize the BugSplat client
+for sending crashes. This will instantiate a new client instance and store it internally.
 
 ```jsx
 // src/index.tsx
@@ -249,6 +248,60 @@ function App() {
 
 This package re-exports all exports from
 [bugsplat-js](https://github.com/BugSplat-Git/bugsplat-js).
+
+### `init()`
+
+```ts
+interface BugSplatInit {
+  /**
+   * BugSplat database name that crashes should be posted to
+   */
+  database: string;
+  /**
+   * Name of application
+   */
+  application: string;
+  /**
+   * Version of application.
+   */
+  version: string;
+}
+
+/**
+ * Initialize a new BugSplat instance and store the reference in scope
+ *
+ * @returns function with a callback argument that will be
+ * called with the freshly initialized BugSplat instance
+ *
+ * - Useful to subscribe to events or set default properties
+ */
+function init(
+  initOptions: BugSplatInit
+): (func: (instance: BugSplat) => void) => void;
+
+/**
+ * @example
+ */
+init({
+  database: 'fred',
+  application: 'my-react-crasher',
+  version: '3.2.1',
+})((bugSplat) => {
+  bugSplat.setDefaultAppKey('Key!');
+  bugSplat.setDefaultUser('User!');
+  bugSplat.setDefaultEmail('fred@bedrock.com');
+  bugSplat.setDefaultDescription('Description!');
+});
+```
+
+### `getBugSplat()`
+
+```ts
+/**
+ * Get `BugSplat` instance from application scope
+ */
+const getBugSplat: () => BugSplat | null;
+```
 
 ### `ErrorBoundary`
 
