@@ -8,6 +8,7 @@ import { BugSplat, BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
 import { createScope } from '../scope';
 import ErrorBoundary from '../ErrorBoundary';
+import { init } from '../BugSplatScope';
 
 const email = 'fred@bugsplat.com';
 const password = process.env.FRED_PASSWORD;
@@ -40,16 +41,22 @@ describe('<ErrorBoundary />', () => {
     const email = 'fred@bedrock.com';
     const description = 'Description!';
 
-    const bugSplat = new BugSplat(database, application, version);
-    const scope = createScope(bugSplat);
+    const scope = createScope<BugSplat>();
 
-    bugSplat.setDefaultAppKey(appKey);
-    bugSplat.setDefaultUser(user);
-    bugSplat.setDefaultEmail(email);
-    bugSplat.setDefaultDescription(description);
+    init({
+      database,
+      application,
+      version,
+      scope,
+    })((bugSplat) => {
+      bugSplat.setDefaultAppKey(appKey);
+      bugSplat.setDefaultUser(user);
+      bugSplat.setDefaultEmail(email);
+      bugSplat.setDefaultDescription(description);
 
-    bugSplat['_formData'] = () => new globalThis.FormData();
-    bugSplat['_fetch'] = globalThis.fetch;
+      bugSplat['_formData'] = () => new globalThis.FormData();
+      bugSplat['_fetch'] = globalThis.fetch;
+    });
 
     let result: BugSplatResponse | null;
 
