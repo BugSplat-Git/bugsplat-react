@@ -212,7 +212,7 @@ export class ErrorBoundary extends Component<
       prevState.error !== null &&
       isArrayDiff(prevProps.resetKeys, resetKeys)
     ) {
-      onResetKeysChange?.(prevProps.resetKeys, resetKeys);
+      onResetKeysChange(prevProps.resetKeys, resetKeys);
       this.reset();
     }
   }
@@ -223,7 +223,7 @@ export class ErrorBoundary extends Component<
 
   componentWillUnmount() {
     const { error, componentStack, response } = this.state;
-    this.props.onUnmount?.(error, componentStack, response);
+    this.props.onUnmount(error, componentStack, response);
   }
 
   async handleError(error: Error, { componentStack }: ErrorInfo) {
@@ -233,7 +233,7 @@ export class ErrorBoundary extends Component<
     let response: BugSplatResponse | null = null;
 
     if (bugSplat && !disablePost) {
-      beforePost?.(bugSplat, error, componentStack);
+      beforePost(bugSplat, error, componentStack);
       try {
         response = await bugSplat.post(error, {
           additionalFormDataParams: [packComponentStack(componentStack)],
@@ -243,13 +243,13 @@ export class ErrorBoundary extends Component<
       }
     }
 
-    onError?.(error, componentStack, response);
+    onError(error, componentStack, response);
     this.setState({ error, componentStack, response });
   }
 
   resetErrorBoundary = (...args: unknown[]) => {
     const { error, componentStack, response } = this.state;
-    this.props.onReset?.(error, componentStack, response, args);
+    this.props.onReset(error, componentStack, response, args);
     this.reset();
   };
 
