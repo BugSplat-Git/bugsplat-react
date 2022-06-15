@@ -61,7 +61,7 @@ internally.
 ```jsx
 // src/index.tsx
 
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { init } from 'bugsplat-react';
 import App from './App';
 import * as packageJson from '../package.json';
@@ -72,7 +72,9 @@ init({
   version: packageJson.version,
 });
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const root = createRoot(document.getElementById('root'));
+
+root.render(<App />);
 ```
 
 You can now wrap your component trees with `ErrorBoundary` to capture rendering
