@@ -55,7 +55,8 @@ database name.
 
 In the root of your project, import your project's `package.json`. Use it's
 `name`, `database`, and `version` properties to initialize the BugSplat client
-for sending crashes. This will instantiate a new client instance and store it internally.
+for sending crashes. This will instantiate a new client instance and store it
+internally.
 
 ```jsx
 // src/index.tsx
@@ -277,7 +278,7 @@ interface BugSplatInit {
  */
 function init(
   initOptions: BugSplatInit
-): (func: (instance: BugSplat) => void) => void;
+): (withInstance: (instance: BugSplat) => void) => void;
 
 /**
  * @example

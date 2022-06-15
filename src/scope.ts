@@ -1,5 +1,5 @@
 /**
- * Scope container for shared instance management
+ * Container for shared instance management
  */
 export interface Scope<Type> {
   /**
@@ -13,7 +13,7 @@ export interface Scope<Type> {
 }
 
 /**
- * Create a scope container for managing a shared instance
+ * Scope factory function
  */
 export function createScope<Type>(
   defaultValue: Type | null = null
