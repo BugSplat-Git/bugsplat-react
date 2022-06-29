@@ -7,6 +7,7 @@ import {
   ReactElement,
   ReactNode,
 } from 'react';
+import { getBugSplat } from './appScope';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -148,7 +149,7 @@ export interface ErrorBoundaryState {
    */
   componentStack: ErrorInfo['componentStack'] | null;
   /**
-   * Response from a BugSplat crash post
+   * Response from most recent BugSplat crash post
    */
   response: BugSplatResponse | null;
 }
@@ -190,7 +191,7 @@ export class ErrorBoundary extends Component<
     onResetKeysChange: noop,
     onUnmount: noop,
     disablePost: false,
-    scope: { getClient: () => null },
+    scope: { getClient: getBugSplat },
   };
 
   state = INITIAL_STATE;

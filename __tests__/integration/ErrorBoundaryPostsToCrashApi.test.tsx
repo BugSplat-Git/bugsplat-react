@@ -4,11 +4,10 @@ import {
   Environment,
 } from '@bugsplat/js-api-client';
 import { render, waitFor, screen } from '@testing-library/react';
-import { BugSplat, BugSplatResponse } from 'bugsplat';
+import { BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
-import { createScope } from '../../src/scope';
 import ErrorBoundary from '../../src/ErrorBoundary';
-import { init } from '../../src/BugSplatScope';
+import { init } from '../../src/appScope';
 
 const email = 'fred@bugsplat.com';
 const password = process.env.FRED_PASSWORD;
@@ -41,13 +40,10 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
     const email = 'fred@bedrock.com';
     const description = 'Description!';
 
-    const scope = BugSplat;
-
     init({
       database,
       application,
       version,
-      scope,
     })((bugSplat) => {
       bugSplat.setDefaultAppKey(appKey);
       bugSplat.setDefaultUser(user);
@@ -70,7 +66,6 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
             {(response?.response as BugSplatResponseBody)?.crash_id}
           </div>
         )}
-        client
       >
         <BlowUp />
       </ErrorBoundary>

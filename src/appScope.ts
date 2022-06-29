@@ -23,7 +23,7 @@ export interface BugSplatInit {
 /**
  * Container for managing shared `BugSplat` instance
  */
-const BugSplatScope: Scope = new Scope();
+const appScope: Scope = new Scope();
 
 /**
  * Initialize a new BugSplat instance and store the reference in scope
@@ -49,7 +49,7 @@ export function init({
   database,
   application,
   version,
-  scope = BugSplatScope,
+  scope = appScope,
 }: BugSplatInit) {
   const client = new BugSplat(database, application, version);
 
@@ -57,3 +57,8 @@ export function init({
 
   return (func: (client: BugSplat) => void) => func(client);
 }
+
+/**
+ * @returns BugSplat client instance or null if unset
+ */
+export const getBugSplat = (scope = appScope) => scope.getClient();
