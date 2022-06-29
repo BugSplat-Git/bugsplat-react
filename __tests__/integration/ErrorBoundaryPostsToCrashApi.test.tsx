@@ -6,9 +6,9 @@ import {
 import { render, waitFor, screen } from '@testing-library/react';
 import { BugSplat, BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
-import { createScope } from '../scope';
-import ErrorBoundary from '../ErrorBoundary';
-import { init } from '../BugSplatScope';
+import { createScope } from '../../src/scope';
+import ErrorBoundary from '../../src/ErrorBoundary';
+import { init } from '../../src/BugSplatScope';
 
 const email = 'fred@bugsplat.com';
 const password = process.env.FRED_PASSWORD;
@@ -20,7 +20,7 @@ function BlowUp(): JSX.Element {
   throw BlowUpError;
 }
 
-describe('<ErrorBoundary />', () => {
+describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
   let client: CrashApiClient;
 
   beforeEach(async () => {
@@ -41,7 +41,7 @@ describe('<ErrorBoundary />', () => {
     const email = 'fred@bedrock.com';
     const description = 'Description!';
 
-    const scope = createScope<BugSplat>();
+    const scope = BugSplat;
 
     init({
       database,
@@ -70,7 +70,7 @@ describe('<ErrorBoundary />', () => {
             {(response?.response as BugSplatResponseBody)?.crash_id}
           </div>
         )}
-        scope={scope}
+        client
       >
         <BlowUp />
       </ErrorBoundary>

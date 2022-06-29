@@ -1,9 +1,22 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { BugSplat } from 'bugsplat';
+import { BugSplat, BugSplatOptions, BugSplatResponse } from 'bugsplat';
 import { useState } from 'react';
-import { ErrorBoundary } from '../ErrorBoundary';
-import { createScope, Scope } from '../scope';
-import MockBugSplat, { mockPost } from '../__mocks__/MockBugSplat';
+import { ErrorBoundary } from '../src/ErrorBoundary';
+import { Scope } from '../src/scope';
+
+export const mockPost = jest.fn(
+  async (_errorToPost: string | Error, _options?: BugSplatOptions) =>
+    new Promise<BugSplatResponse>((resolve) => resolve({} as BugSplatResponse))
+);
+
+const MockBugSplat = jest.fn(function (
+  this: BugSplat,
+  ..._args: ConstructorParameters<typeof BugSplat>
+) {
+  this.post = mockPost;
+
+  return this;
+});
 
 const BlowUpError = new Error('Error thrown during render.');
 
@@ -66,11 +79,12 @@ describe('<ErrorBoundary />', () => {
     });
 
     describe('when BugSplat has been initialized', () => {
-      let scope: Scope<BugSplat>;
+      let bugSplat: BugSplat;
+      let scope: Pick<Scope, 'getClient'>;
 
       beforeEach(() => {
-        scope = createScope();
-        scope.setInstance(new MockBugSplat('db1', 'this app', '3.2.1'));
+        bugSplat = new MockBugSplat('db1', 'this app', '3.2.1');
+        scope = { getClient: () => bugSplat };
       });
 
       it('should call onError', async () => {

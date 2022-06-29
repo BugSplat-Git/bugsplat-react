@@ -1,4 +1,4 @@
-import withErrorBoundary from '../withErrorBoundary';
+import withErrorBoundary from '../src/withErrorBoundary';
 
 describe('withErrorBoundary', () => {
   it('sets displayName properly', () => {
@@ -13,3 +13,4 @@ describe('withErrorBoundary', () => {
     expect(Component.displayName).toBe('ErrorBoundary(Component)');
   });
 });
+

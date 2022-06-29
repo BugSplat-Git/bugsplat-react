@@ -7,7 +7,6 @@ import {
   ReactElement,
   ReactNode,
 } from 'react';
-import BugSplatScope from './BugSplatScope';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -129,9 +128,9 @@ interface InternalErrorBoundaryProps {
   children?: ReactNode | ReactNode[];
 
   /**
-   * Scope container for the BugSplat instance that is used to post errors
+   * BugSplat client instance
    */
-  scope: { getInstance(): BugSplat | null };
+  scope: { getClient(): BugSplat | null };
 }
 
 export type ErrorBoundaryProps = JSX.LibraryManagedAttributes<
@@ -191,13 +190,13 @@ export class ErrorBoundary extends Component<
     onResetKeysChange: noop,
     onUnmount: noop,
     disablePost: false,
-    scope: BugSplatScope,
+    scope: { getClient: () => null },
   };
 
   state = INITIAL_STATE;
 
   componentDidMount() {
-    this.props.onMount?.();
+    this.props.onMount();
   }
 
   componentDidUpdate(
@@ -229,13 +228,14 @@ export class ErrorBoundary extends Component<
   async handleError(error: Error, { componentStack }: ErrorInfo) {
     const { onError, beforePost, disablePost, scope } = this.props;
 
-    const bugSplat = scope.getInstance();
     let response: BugSplatResponse | null = null;
 
-    if (bugSplat && !disablePost) {
-      beforePost(bugSplat, error, componentStack);
+    const client = scope.getClient();
+
+    if (client && !disablePost) {
+      beforePost(client, error, componentStack);
       try {
-        response = await bugSplat.post(error, {
+        response = await client.post(error, {
           additionalFormDataParams: [packComponentStack(componentStack)],
         });
       } catch (err) {

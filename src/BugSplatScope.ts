@@ -1,5 +1,5 @@
 import { BugSplat } from 'bugsplat';
-import { createScope, Scope } from './scope';
+import { Scope } from './scope';
 
 export interface BugSplatInit {
   /**
@@ -17,13 +17,13 @@ export interface BugSplatInit {
   /**
    * Container for BugSplat client instance
    */
-  scope?: Scope<BugSplat>;
+  scope?: Scope;
 }
 
 /**
  * Container for managing shared `BugSplat` instance
  */
-const BugSplatScope = createScope<BugSplat>();
+const BugSplatScope: Scope = new Scope();
 
 /**
  * Initialize a new BugSplat instance and store the reference in scope
@@ -51,13 +51,9 @@ export function init({
   version,
   scope = BugSplatScope,
 }: BugSplatInit) {
-  const bugSplat = new BugSplat(database, application, version);
+  const client = new BugSplat(database, application, version);
 
-  scope.setInstance(bugSplat);
+  scope.setClient(client);
 
-  return (func: (instance: BugSplat) => void) => func(bugSplat);
+  return (func: (client: BugSplat) => void) => func(client);
 }
-
-export const getBugSplat = BugSplatScope.getInstance;
-
-export default BugSplatScope;

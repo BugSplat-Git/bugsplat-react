@@ -1,32 +1,61 @@
+import { BugSplat } from 'bugsplat';
+
 /**
- * Container for shared instance management
+ * Encapsulate BugSplat client instance
  */
-export interface Scope<Type> {
+export class Scope {
+  constructor(private client: BugSplat | null = null) {}
+
   /**
-   * @returns scoped instance or `null` if one isn't set.
+   * @returns BugSplat client instance or null if unset
    */
-  getInstance: () => Type | null;
+  getClient() {
+    return this.client;
+  }
+
+  setClient(client: BugSplat | null) {
+    this.client = client;
+  }
+
   /**
-   * Set scoped instance
+   * Call fn with the client if it has been initialized.
+   * Otherwise, do nothing
    */
-  setInstance: (value: Type | null) => void;
+  withClient<R = unknown>(fn: (bugSplat: BugSplat) => R) {
+    if (this.client) {
+      return fn(this.client);
+    }
+  }
 }
 
-/**
- * Scope factory function
- */
-export function createScope<Type>(
-  defaultValue: Type | null = null
-): Scope<Type> {
-  let instance = defaultValue;
+const bugSplatScope = new Scope();
 
-  return {
-    setInstance(value) {
-      instance = value;
-    },
+export interface BugSplatInit {
+  /**
+   * BugSplat database name that crashes should be posted to
+   */
+  database: string;
+  /**
+   * Name of application
+   */
+  application: string;
+  /**
+   * Version of application.
+   */
+  version: string;
+  /**
+   * Container for BugSplat client instance
+   */
+  scope?: Scope;
+}
 
-    getInstance() {
-      return instance;
-    },
-  };
+export function init({
+  database,
+  application,
+  version,
+  scope = bugSplatScope,
+}: BugSplatInit) {
+  const client = new BugSplat(database, application, version);
+
+  scope.setClient(client);
 }

@@ -8,8 +8,9 @@
     "src"
   ],
   "scripts": {
-    "test": "jest --testPathIgnorePatterns=/src/__integration_tests__/",
-    "test:integration": "jest src/__integration_tests__/",
+    "test": "jest --selectProjects unit",
+    "test:integration": "jest --selectProjects integration",
+    "test:t": "jest --selectProjects integration",
     "build": "tsc -p ./tsconfig.build.json",
     "prepare": "npm run build",
     "format": "prettier --write src/"
