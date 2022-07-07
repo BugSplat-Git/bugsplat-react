@@ -27,7 +27,7 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
 /**
  * Pack a component stack trace string into an expected object shape
  */
-function packComponentStack(componentStack: string): FormDataParam {
+function createComponentStack(componentStack: string): FormDataParam {
   return {
     key: 'componentStack',
     value: new Blob([componentStack]),
@@ -237,7 +237,7 @@ export class ErrorBoundary extends Component<
       beforePost(client, error, componentStack);
       try {
         response = await client.post(error, {
-          additionalFormDataParams: [packComponentStack(componentStack)],
+          additionalFormDataParams: [createComponentStack(componentStack)],
         });
       } catch (err) {
         console.error(err);
