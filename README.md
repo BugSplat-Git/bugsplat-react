@@ -207,7 +207,9 @@ function Component() {
 ```jsx
 function Component() {
   return (
-    <ErrorBoundary fallback={() => <div>Oops, there was a problem.</div>}>
+    <ErrorBoundary
+      fallback={(fallbackProps) => <div>Oops, there was a problem.</div>}
+    >
       ...
     </ErrorBoundary>
   );
@@ -278,9 +280,11 @@ interface BugSplatInit {
  *
  * - Useful to subscribe to events or set default properties
  */
-function init(
-  initOptions: BugSplatInit
-): (withInstance: (instance: BugSplat) => void) => void;
+export function init({
+  database,
+  application,
+  version,
+}: BugSplatInit): (initializer: (client: BugSplat) => void) => void;
 
 /**
  * @example
@@ -316,45 +320,46 @@ interface FallbackProps {
   resetErrorBoundary: (...args: unknown[]) => void;
 }
 
-type FallbackElement = ReactElement<
-  unknown,
-  string | FunctionComponent | typeof Component
-> | null;
+type FallbackElement = ReactElement | null;
 
 type FallbackRender = (props: FallbackProps) => FallbackElement;
 
+/**
+ * All props in ErrorBoundaryProps are optional,
+ * but we recommend at least setting the fallback prop.
+ */
 interface ErrorBoundaryProps {
   /**
    * Callback called before error post to BugSplat.
+   *
+   * This will be awaited if it is a promise
    */
-  beforePost?: (
+  beforePost: (
     bugSplat: BugSplat,
     error: Error | null,
     componentStack: string | null
-  ) => void;
+  ) => void | Promise<void>;
 
   /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
+   *
+   * This will be awaited if it is a promise
    */
-  onError?: (
+  onError: (
     error: Error,
     componentStack: string,
     response: BugSplatResponse | null
-  ) => void;
+  ) => void | Promise<void>;
 
   /**
    * Callback called on componentDidMount().
    */
-  onMount?: () => void;
+  onMount: () => void;
 
   /**
    * Callback called on componentWillUnmount().
    */
-  onUnmount?: (
-    error: Error | null,
-    componentStack: string | null,
-    response: BugSplatResponse | null
-  ) => void;
+  onUnmount: (state: ErrorBoundaryState) => void;
 
   /**
    * Callback called before ErrorBoundary resets internal state,
@@ -362,20 +367,17 @@ interface ErrorBoundaryProps {
    * used to ensure that rerendering of children would not
    * repeat the same error that occurred.
    *
-   * *Not called when reset from change in resetKeys -
-   * use onResetKeysChange for that.*
+   * *This method is not called when ErrorBoundary is reset from a
+   * change in resetKeys - use onResetKeysChange for that.*
+   * @param state - Current error boundary state
+   * @param ...args - Additional arguments passed from where it is called
    */
-  onReset?: (
-    error: Error | null,
-    componentStack: string | null,
-    response: BugSplatResponse | null,
-    extraArgs?: unknown[]
-  ) => void;
+  onReset: (state: ErrorBoundaryState, ...args: unknown[]) => void;
 
   /**
    * Callback called when keys passed to resetKeys are changed.
    */
-  onResetKeysChange?: (prevResetKeys?: unknown[], resetKeys?: unknown[]) => void;
+  onResetKeysChange: (prevResetKeys?: unknown[], resetKeys?: unknown[]) => void;
 
   /**
    * Array of values passed from parent scope. When ErrorBoundary
@@ -401,6 +403,17 @@ interface ErrorBoundaryProps {
    * Child elements to be rendered when there is no error
    */
   children?: ReactNode | ReactNode[];
+
+  /**
+   * __Advanced Use__
+   *
+   * Object used by ErrorBoundary to retrieve a BugSplat client instance.
+   *
+   * Advanced users can extend the `BugSplat` class and use this property
+   * to pass their own scope that will inject the client for use by
+   * ErrorBoundary.
+   */
+  scope: { getClient(): BugSplat | null };
 }
 
 interface ErrorBoundaryState {
@@ -448,6 +461,7 @@ function withErrorBoundary<P extends Record<string, unknown>>(
  * * Imperatively - by calling the returned handler with an error
  *
  * @param errorProp - Will throw when a truthy value is passed
+ * @returns Error handler that will throw when called with a truthy value
  */
 function useErrorHandler(errorProp?: unknown): (error: unknown) => void;
 ```

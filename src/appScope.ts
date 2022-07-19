@@ -50,7 +50,7 @@ export function init({
   application,
   version,
   scope = appScope,
-}: BugSplatInit) {
+}: BugSplatInit): (initializer: (client: BugSplat) => void) => void {
   const client = new BugSplat(database, application, version);
 
   scope.setClient(client);

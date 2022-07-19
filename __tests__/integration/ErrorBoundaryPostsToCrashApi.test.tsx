@@ -9,9 +9,17 @@ import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
 import { ErrorBoundary } from '../../src/ErrorBoundary';
 import { init } from '../../src/appScope';
 
-const email = 'fred@bugsplat.com';
-const password = process.env.FRED_PASSWORD;
 const appBaseUrl = 'https://app.bugsplat.com';
+
+const email = process.env.EMAIL;
+if (!email) {
+  throw new Error('`EMAIL` environment variable must be set!');
+}
+
+const password = process.env.PASSWORD;
+if (!password) {
+  throw new Error('`PASSWORD` environment variable must be set!');
+}
 
 const BlowUpError = new Error('Error thrown during render.');
 
@@ -23,9 +31,6 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
   let client: CrashApiClient;
 
   beforeEach(async () => {
-    if (!password) {
-      throw new Error('`FRED_PASSWORD` environment variable must be set!');
-    }
     const apiClient = new BugSplatApiClient(appBaseUrl, Environment.Node);
     await apiClient.login(email, password);
     client = new CrashApiClient(apiClient);
