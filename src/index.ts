@@ -5,7 +5,8 @@ export type {
   BugSplatResponse,
   FormDataParam,
 } from 'bugsplat';
+
 export * from './appScope';
 export * from './ErrorBoundary';
-export { default as useErrorHandler } from './useErrorHandler';
-export { default as withErrorBoundary } from './withErrorBoundary';
+export * from './useErrorHandler';
+export * from './withErrorBoundary';

@@ -6,7 +6,7 @@ import {
 import { render, waitFor, screen } from '@testing-library/react';
 import { BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
-import ErrorBoundary from '../../src/ErrorBoundary';
+import { ErrorBoundary } from '../../src/ErrorBoundary';
 import { init } from '../../src/appScope';
 
 const email = 'fred@bugsplat.com';

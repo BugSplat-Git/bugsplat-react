@@ -55,7 +55,7 @@ export function init({
 
   scope.setClient(client);
 
-  return (func: (client: BugSplat) => void) => func(client);
+  return (initializer: (client: BugSplat) => void) => initializer(client);
 }
 
 /**

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useEffect, useState } from 'react';
-import useErrorHandler from '../src/useErrorHandler';
-import ErrorBoundary, { FallbackProps } from '../src/ErrorBoundary';
+import { useErrorHandler } from '../src/useErrorHandler';
+import { ErrorBoundary, FallbackProps } from '../src/ErrorBoundary';
 
 function Fallback({ error, resetErrorBoundary }: FallbackProps) {
   return (
@@ -85,4 +85,3 @@ describe('useErrorHandler hook used in child of ErrorBoundary', () => {
     await screen.findByRole('main');
   });
 });
-

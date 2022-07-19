@@ -1,10 +1,10 @@
 import { ComponentType } from 'react';
-import ErrorBoundary, { ErrorBoundaryProps } from './ErrorBoundary';
+import { ErrorBoundary, ErrorBoundaryProps } from './ErrorBoundary';
 
 /**
  * Higher order component to wrap your component tree with ErrorBoundary
  */
-export default function withErrorBoundary<P extends Record<string, unknown>>(
+export function withErrorBoundary<P extends Record<string, unknown>>(
   Component: ComponentType<P>,
   errorBoundaryProps: ErrorBoundaryProps = {}
 ): ComponentType<P> {

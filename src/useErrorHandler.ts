@@ -12,10 +12,9 @@ import { useState } from 'react';
  * * Imperatively - by calling the returned handler with an error
  *
  * @param errorProp - Will throw when a truthy value is passed
+ * @returns Error handler that will throw when called with a truthy value
  */
-export default function useErrorHandler(
-  errorProp?: unknown
-): (error: unknown) => void {
+export function useErrorHandler(errorProp?: unknown): (error: unknown) => void {
   const [error, setError] = useState<unknown>(null);
 
   if (errorProp) {

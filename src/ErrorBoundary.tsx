@@ -27,7 +27,9 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
 /**
  * Pack a component stack trace string into an expected object shape
  */
-function createComponentStack(componentStack: string): FormDataParam {
+function createComponentStackFormDataParam(
+  componentStack: string
+): FormDataParam {
   return {
     key: 'componentStack',
     value: new Blob([componentStack]),
@@ -129,7 +131,7 @@ interface InternalErrorBoundaryProps {
   children?: ReactNode | ReactNode[];
 
   /**
-   * BugSplat client instance
+   * Scope for accessing BugSplat client instance
    */
   scope: { getClient(): BugSplat | null };
 }
@@ -237,7 +239,9 @@ export class ErrorBoundary extends Component<
       beforePost(client, error, componentStack);
       try {
         response = await client.post(error, {
-          additionalFormDataParams: [createComponentStack(componentStack)],
+          additionalFormDataParams: [
+            createComponentStackFormDataParam(componentStack),
+          ],
         });
       } catch (err) {
         console.error(err);
@@ -259,26 +263,29 @@ export class ErrorBoundary extends Component<
   }
 
   render() {
-    const { error, componentStack, response } = this.state;
-    const { fallback, children } = this.props;
+    const {
+      state: { error, componentStack, response },
+      props: { fallback, children },
+      resetErrorBoundary,
+    } = this;
 
-    if (error) {
-      if (isValidElement(fallback)) {
-        return fallback;
-      } else if (typeof fallback === 'function') {
-        return fallback({
-          error,
-          componentStack,
-          response,
-          resetErrorBoundary: this.resetErrorBoundary,
-        });
-      } else {
-        return null;
-      }
+    if (!error) {
+      return children;
     }
 
-    return children;
+    if (isValidElement(fallback)) {
+      return fallback;
+    }
+
+    if (typeof fallback === 'function') {
+      return fallback({
+        error,
+        componentStack,
+        response,
+        resetErrorBoundary,
+      });
+    }
+
+    return null;
   }
 }
-
-export default ErrorBoundary;
