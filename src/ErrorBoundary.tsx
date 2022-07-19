@@ -1,8 +1,8 @@
 import { BugSplat, BugSplatResponse, FormDataParam } from 'bugsplat';
 import {
   Component,
-  ErrorInfo,
-  FunctionComponent,
+  type ErrorInfo,
+  type FunctionComponent,
   isValidElement,
   ReactElement,
   ReactNode,
@@ -54,21 +54,25 @@ export type FallbackRender = (props: FallbackProps) => FallbackElement;
 interface InternalErrorBoundaryProps {
   /**
    * Callback called before error post to BugSplat.
+   *
+   * This will be awaited if it is a promise
    */
   beforePost: (
     bugSplat: BugSplat,
     error: Error | null,
     componentStack: string | null
-  ) => void;
+  ) => void | Promise<void>;
 
   /**
    * Callback called when ErrorBoundary catches an error in componentDidCatch()
+   *
+   * This will be awaited if it is a promise
    */
   onError: (
     error: Error,
     componentStack: string,
     response: BugSplatResponse | null
-  ) => void;
+  ) => void | Promise<void>;
 
   /**
    * Callback called on componentDidMount().
@@ -78,11 +82,7 @@ interface InternalErrorBoundaryProps {
   /**
    * Callback called on componentWillUnmount().
    */
-  onUnmount: (
-    error: Error | null,
-    componentStack: string | null,
-    response: BugSplatResponse | null
-  ) => void;
+  onUnmount: (state: ErrorBoundaryState) => void;
 
   /**
    * Callback called before ErrorBoundary resets internal state,
@@ -90,15 +90,12 @@ interface InternalErrorBoundaryProps {
    * used to ensure that rerendering of children would not
    * repeat the same error that occurred.
    *
-   * *Not called when reset from change in resetKeys -
-   * use onResetKeysChange for that.*
+   * *This method is not called when ErrorBoundary is reset from a
+   * change in resetKeys - use onResetKeysChange for that.*
+   * @param state - Current error boundary state
+   * @param ...args - Additional arguments passed from where it is called
    */
-  onReset: (
-    error: Error | null,
-    componentStack: string | null,
-    response: BugSplatResponse | null,
-    extraArgs?: unknown[]
-  ) => void;
+  onReset: (state: ErrorBoundaryState, ...args: unknown[]) => void;
 
   /**
    * Callback called when keys passed to resetKeys are changed.
@@ -219,42 +216,42 @@ export class ErrorBoundary extends Component<
     }
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.handleError(error, errorInfo).catch(console.error);
+  componentDidCatch(error: Error, { componentStack }: ErrorInfo) {
+    this.setState({ error, componentStack });
+    this.handleError(error, componentStack).catch(console.error);
   }
 
   componentWillUnmount() {
-    const { error, componentStack, response } = this.state;
-    this.props.onUnmount(error, componentStack, response);
+    this.props.onUnmount({ ...this.state });
   }
 
-  async handleError(error: Error, { componentStack }: ErrorInfo) {
-    const { onError, beforePost, disablePost, scope } = this.props;
-
-    let response: BugSplatResponse | null = null;
-
+  async dispatchPost(error: Error, componentStack: string) {
+    const { beforePost, disablePost, scope } = this.props;
     const client = scope.getClient();
 
-    if (client && !disablePost) {
-      beforePost(client, error, componentStack);
-      try {
-        response = await client.post(error, {
-          additionalFormDataParams: [
-            createComponentStackFormDataParam(componentStack),
-          ],
-        });
-      } catch (err) {
-        console.error(err);
-      }
+    if (!client || disablePost) {
+      return null;
     }
 
-    onError(error, componentStack, response);
-    this.setState({ error, componentStack, response });
+    await beforePost(client, error, componentStack);
+
+    return client.post(error, {
+      additionalFormDataParams: [
+        createComponentStackFormDataParam(componentStack),
+      ],
+    });
+  }
+
+  async handleError(error: Error, componentStack: string) {
+    const response = await this.dispatchPost(error, componentStack);
+
+    this.setState({ response });
+
+    return this.props.onError(error, componentStack, response);
   }
 
   resetErrorBoundary = (...args: unknown[]) => {
-    const { error, componentStack, response } = this.state;
-    this.props.onReset(error, componentStack, response, args);
+    this.props.onReset({ ...this.state }, ...args);
     this.reset();
   };
 
