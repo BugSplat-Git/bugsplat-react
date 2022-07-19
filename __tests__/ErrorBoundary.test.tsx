@@ -98,7 +98,7 @@ describe('<ErrorBoundary />', () => {
         await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
       });
 
-      it('should not post if skipPost is set to true', () => {
+      it('should not post if disablePost is set to true', () => {
         const mockBeforePost = jest.fn();
         render(
           <ErrorBoundary disablePost beforePost={mockBeforePost} scope={scope}>
