@@ -1,11 +1,14 @@
-import { BugSplat, BugSplatResponse, FormDataParam } from 'bugsplat';
+import {
+  type BugSplat,
+  type BugSplatResponse,
+  type FormDataParam,
+} from 'bugsplat';
 import {
   Component,
   type ErrorInfo,
-  type FunctionComponent,
   isValidElement,
-  ReactElement,
-  ReactNode,
+  type ReactElement,
+  type ReactNode,
 } from 'react';
 import { getBugSplat } from './appScope';
 
@@ -44,10 +47,7 @@ export interface FallbackProps {
   resetErrorBoundary: (...args: unknown[]) => void;
 }
 
-export type FallbackElement = ReactElement<
-  unknown,
-  string | FunctionComponent | typeof Component
-> | null;
+export type FallbackElement = ReactElement | null;
 
 export type FallbackRender = (props: FallbackProps) => FallbackElement;
 
@@ -128,7 +128,13 @@ interface InternalErrorBoundaryProps {
   children?: ReactNode | ReactNode[];
 
   /**
-   * Scope for accessing BugSplat client instance
+   * __Advanced Use__
+   *
+   * Object used by ErrorBoundary to retrieve a BugSplat client instance.
+   *
+   * Advanced users can extend the `BugSplat` class and use this property
+   * to pass their own scope that will inject the client for use by
+   * ErrorBoundary.
    */
   scope: { getClient(): BugSplat | null };
 }

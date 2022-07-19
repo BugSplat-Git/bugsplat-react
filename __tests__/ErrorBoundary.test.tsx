@@ -110,17 +110,17 @@ describe('<ErrorBoundary />', () => {
         expect(mockBeforePost).toHaveBeenCalledTimes(0);
       });
 
-      it('should call BugSplat.post', () => {
+      it('should call BugSplat.post', async () => {
         render(
           <ErrorBoundary scope={scope}>
             <BlowUp />
           </ErrorBoundary>
         );
 
-        expect(mockPost).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
       });
 
-      it('should call beforePost', () => {
+      it('should call beforePost', async () => {
         const mockBeforePost = jest.fn();
         render(
           <ErrorBoundary beforePost={mockBeforePost} scope={scope}>
@@ -128,8 +128,8 @@ describe('<ErrorBoundary />', () => {
           </ErrorBoundary>
         );
 
-        expect(mockPost).toHaveBeenCalledTimes(1);
-        expect(mockBeforePost).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(mockBeforePost).toHaveBeenCalledTimes(1));
+        await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
       });
     });
 
@@ -204,8 +204,6 @@ describe('<ErrorBoundary />', () => {
       // recover via try again button
       fireEvent.click(screen.getByText('Try Again'));
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      const extraArgsCall = handleReset.mock.calls[0][3];
-      expect(extraArgsCall).toEqual(['TRY_AGAIN_ARG1', 'TRY_AGAIN_ARG2']);
       expect(handleReset).toHaveBeenCalledTimes(1);
       handleReset.mockClear();
       expect(handleResetKeysChange).not.toHaveBeenCalled();
