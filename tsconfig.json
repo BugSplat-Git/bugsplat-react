@@ -10,7 +10,6 @@
     "module": "Node16",
     "moduleResolution": "node",
     "noEmitOnError": true,
-    "noImplicitAny": true,
     "outDir": "./dist",
     "skipLibCheck": true,
     "sourceMap": true,
