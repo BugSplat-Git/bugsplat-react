@@ -314,9 +314,23 @@ const getBugSplat: () => BugSplat | null;
 
 ```typescript
 interface FallbackProps {
+  /**
+   * Error that caused crash
+   */
   error: Error;
+  /**
+   * Component stack trace leading to error
+   */
   componentStack: string | null;
+  /**
+   * Crash post response
+   */
   response: BugSplatResponse | null;
+  /**
+   * Reset error boundary state.
+   *
+   * This will pass any arguments to the end of onReset when it is called
+   */
   resetErrorBoundary: (...args: unknown[]) => void;
 }
 
