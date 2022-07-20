@@ -1,4 +1,3 @@
-// re-export types from bugsplat-js
 export type {
   BugSplat,
   BugSplatOptions,

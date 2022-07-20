@@ -4,14 +4,10 @@
   </a>  
 </h1>
 
-<h2 align="center">
-  bugsplat-react
-</h2>
-
 ## Introduction
 
 BugSplat supports the collection of errors in React applications. The
-bugsplat-react npm package implements an
+@bugsplat/react npm package implements an
 [ErrorBoundary](https://reactjs.org/docs/error-boundaries.html)
 component in order to capture rendering errors in child components and
 post them to BugSplat where they can be tracked and managed. The package
@@ -31,11 +27,11 @@ easy. Before getting started please complete the following tasks:
 ## Get Started
 
 To start using BugSplat in your React application, run the following command
-at the root of your project. This will install bugsplat-react and its sub
+at the root of your project. This will install @bugsplat/react and its sub
 dependency [bugsplat](https://github.com/BugSplat-Git/bugsplat-js).
 
 ```shell
-npm i bugsplat-react --save
+npm i @bugsplat/react --save
 ```
 
 In addition to standard `package.json` properties `name` and `version`, include
@@ -62,7 +58,7 @@ internally.
 // src/index.tsx
 
 import { createRoot } from 'react-dom/client';
-import { init } from 'bugsplat-react';
+import { init } from '@bugsplat/react';
 import App from './App';
 import * as packageJson from '../package.json';
 
@@ -84,7 +80,7 @@ instance we initialized earlier.
 ```jsx
 // src/App.tsx
 
-import { ErrorBoundary } from 'bugsplat-react';
+import { ErrorBoundary } from '@bugsplat/react';
 
 export default function App() {
   return (
@@ -101,7 +97,7 @@ calling `getBugSplat()`
 ```jsx
 // src/App.tsx
 
-import { getBugSplat } from 'bugsplat-react';
+import { getBugSplat } from '@bugsplat/react';
 
 export default function App() {
   const handleClick = () => {
@@ -130,7 +126,7 @@ if you manage the error state yourself or get it from another library.
 // src/App.tsx
 
 import { useState } from 'react'
-import { ErrorBoundary, useErrorHandler } from 'bugsplat-react';
+import { ErrorBoundary, useErrorHandler } from '@bugsplat/react';
 
 function NestedComponent() {
   const handleError = useErrorHandler();
@@ -243,9 +239,39 @@ function App() {
       onReset={() => setError(null)}
       resetKeys={[error]}
     >
-      ...
+      {}
     </ErrorBoundary>
   );
+}
+```
+
+## Advanced Usage
+
+### The `scope` property
+
+If you know what you're doing and want ErrorBoundary functionality
+beyond what is possible through props and callbacks, you can extend the
+BugSplat client and pass it to the ErrorBoundary through it's `scope` property.
+
+```jsx
+import { BugSplat } from 'bugsplat';
+import { ErrorBoundary } from '@bugsplat/react';
+import SomeService from '@some/service';
+
+class CustomBugSplatClient extends BugSplat {
+  async post(error: CustomError) {
+    await SomeService.post(error);
+
+    return super.post(error);
+  }
+}
+
+const client = new CustomBugSplatClient();
+
+function App() {
+  <ErrorBoundary scope={{ getClient: () => client }}>
+    <ChildComponents />
+  </ErrorBoundary>;
 }
 ```
 

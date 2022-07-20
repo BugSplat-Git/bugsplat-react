@@ -4,11 +4,5 @@
     "noEmit": true
   },
   "extends": "./tsconfig.json",
-  "include": [
-    "src",
-    "__tests__",
-    "setupTests.ts",
-    ".eslintrc.js",
-    "jest.config.js"
-  ]
+  "include": ["src", "__tests__", "setupTests.ts", ".eslintrc.js"]
 }
