@@ -479,3 +479,13 @@ function withErrorBoundary<P extends Record<string, unknown>>(
  */
 function useErrorHandler(errorProp?: unknown): (error: unknown) => void;
 ```
+
+## Test Suite
+
+This package contains both unit and integration tests. To run them,
+use the package.json scripts provided.
+
+| Tests       | Command                    |
+| ----------- | -------------------------- |
+| Unit        | `npm run test`             |
+| Integration | `npm run test:integration` |
