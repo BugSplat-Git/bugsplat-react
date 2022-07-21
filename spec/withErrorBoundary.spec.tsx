@@ -1,4 +1,4 @@
-import { withErrorBoundary } from '../src/withErrorBoundary';
+import { withErrorBoundary } from '../src';
 
 describe('withErrorBoundary', () => {
   it('sets displayName properly', () => {

@@ -7,7 +7,7 @@ const baseConfig = {
   coverageProvider: 'v8',
   globals: { fetch, FormData, Blob },
   preset: 'ts-jest',
-  setupFilesAfterEnv: ['<rootDir>/setupTests.ts'],
+  setupFilesAfterEnv: ['<rootDir>/spec/setupTests.ts'],
   testEnvironment: 'jsdom',
 };
 
@@ -19,12 +19,12 @@ module.exports = {
   projects: [
     {
       displayName: 'unit',
-      testPathIgnorePatterns: ['__tests__/integration'],
+      testPathIgnorePatterns: ['spec/integration'],
       ...baseConfig,
     },
     {
       displayName: 'integration',
-      testMatch: ['**/__tests__/integration/*.tsx'],
+      testMatch: ['**/spec/integration/*.tsx'],
       ...baseConfig,
     },
   ],
