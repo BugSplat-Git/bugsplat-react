@@ -179,120 +179,38 @@ describe('<ErrorBoundary />', () => {
       expect(mockOnReset.mock.lastCall).toContain(TRY_AGAIN_ARGS[1]);
     });
 
-    describe('when any value in resetKeys changes', () => {
-      it('should render children instead of fallback', async () => {
-        function App() {
-          const [key, setKey] = useState(0);
-          return (
-            <ErrorBoundary
-              fallback={() => (
-                <div role="alert">
-                  <button onClick={() => setKey(0)}>reset key</button>
-                </div>
-              )}
-              resetKeys={[key]}
-            >
-              <main>
-                <button onClick={() => setKey((k) => k++)}>
-                  toggle explode
-                </button>
-                {key && <BlowUp />}
-              </main>
-            </ErrorBoundary>
-          );
-        }
-
-        render(<App />);
-
-        // blow up
-        fireEvent.click(screen.getByText('toggle explode'));
-        expect(screen.getByRole('alert')).toBeInTheDocument();
-
-        // recover via resetKeys change
-        fireEvent.click(screen.getByText('reset key'));
-        await waitFor(() => {
-          expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-          expect(screen.queryByRole('main')).toBeInTheDocument();
-        });
-      });
-
-      it('should call onResetKeysChange', async () => {
-        const handleResetKeysChange = jest.fn();
-        const handleReset = jest.fn();
-
-        function App() {
-          const [key, setKey] = useState(1);
-          return (
-            <div>
-              <button onClick={() => setKey((k) => k++)}>toggle explode</button>
-              <ErrorBoundary
-                fallback={() => (
-                  <div role="alert">
-                    <button onClick={() => setKey(0)}>reset key</button>
-                  </div>
-                )}
-                onReset={handleReset}
-                resetKeys={[key]}
-                onResetKeysChange={handleResetKeysChange}
-              >
-                {key ? <BlowUp /> : null}
-              </ErrorBoundary>
-            </div>
-          );
-        }
-
-        render(<App />);
-
-        // blow up
-        fireEvent.click(screen.getByText('toggle explode'));
-        expect(screen.getByRole('alert')).toBeInTheDocument();
-
-        // recover via resetKeys change
-        fireEvent.click(screen.getByText('reset key'));
-        await waitFor(() =>
-          expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    it('should reset when any value in resetKeys changes', async () => {
+      const handleResetKeysChange = jest.fn();
+      const handleReset = jest.fn();
+      function App() {
+        const [key, setKey] = useState(0);
+        return (
+          <ErrorBoundary
+            fallback={<button onClick={() => setKey(0)}>reset</button>}
+            resetKeys={[key]}
+            onReset={handleReset}
+            onResetKeysChange={handleResetKeysChange}
+          >
+            <main>
+              <button onClick={() => setKey((k) => k + 1)}>explode</button>
+              {key && <BlowUp />}
+            </main>
+          </ErrorBoundary>
         );
-        expect(handleReset).not.toHaveBeenCalled();
-        // await waitFor(() => {
-        //   expect(handleResetKeysChange).toHaveBeenCalledWith([1], [0]);
-        // });
-        // expect(handleReset).not.toHaveBeenCalled();
-        // expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      });
+      }
+
+      render(<App />);
+
+      fireEvent.click(screen.getByText('explode'));
+      await waitFor(() => screen.getByText('reset'));
+
+      fireEvent.click(screen.getByText('reset'));
+      await waitFor(() => screen.getByRole('main'));
+
+      expect(screen.queryByText('reset')).not.toBeInTheDocument();
+
+      expect(handleReset).not.toHaveBeenCalled();
+      expect(handleResetKeysChange).toHaveBeenCalledWith([1], [0]);
     });
   });
 });
-
-// // blow it up again
-// fireEvent.click(screen.getByText('toggle explode'));
-// expect(screen.getByRole('alert')).toBeInTheDocument();
-
-// // toggles adding reset key to Array
-// // expect error to re-render
-// fireEvent.click(screen.getByText('reset key'));
-// expect(handleReset).not.toHaveBeenCalled();
-// expect(handleResetKeysChange).toHaveBeenCalledWith([1], [0]);
-// handleResetKeysChange.mockClear();
-// expect(screen.getByRole('alert')).toBeInTheDocument();
-
-// // toggle explode back to false
-// // expect error to re-render again
-// fireEvent.click(screen.getByText('toggle explode'));
-// expect(handleReset).not.toHaveBeenCalled();
-// expect(handleResetKeysChange).toHaveBeenCalledWith(
-//   [true, true],
-//   [false, true]
-// );
-// handleResetKeysChange.mockClear();
-// expect(screen.getByRole('alert')).toBeInTheDocument();
-
-// // toggle extra reset key
-// // expect error to be reset
-// fireEvent.click(screen.getByText('toggle extra reset key'));
-// expect(handleReset).not.toHaveBeenCalled();
-// expect(handleResetKeysChange).toHaveBeenCalledWith(
-//   [false, true],
-//   [false]
-// );
-// handleResetKeysChange.mockClear();
-// expect(screen.queryByRole('alert')).not.toBeInTheDocument();
