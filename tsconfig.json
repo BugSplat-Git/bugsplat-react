@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "esModuleInterop": true,
@@ -16,5 +15,5 @@
     "strict": true,
     "target": "ES6"
   },
-  "include": ["src", "__tests__", "setupTests.ts"]
+  "include": ["src"]
 }

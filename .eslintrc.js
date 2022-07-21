@@ -13,19 +13,9 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: ['./tsconfig.dev.json'],
-    tsconfigRootDir: __dirname,
-    ecmaVersion: 13,
-    sourceType: 'module',
-  },
-  plugins: ['react', 'react-hooks', '@typescript-eslint'],
+  plugins: ['react', 'react-hooks'],
   rules: {
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'react/sort-comp': 1,
   },
   settings: {
@@ -33,4 +23,27 @@ module.exports = {
       version: 'detect',
     },
   },
+  overrides: [
+    {
+      files: ['**/*.ts?(x)'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: 'tsconfig.json',
+        tsconfigRootDir: __dirname,
+        ecmaVersion: 13,
+        sourceType: 'module',
+      },
+      plugins: ['@typescript-eslint'],
+      extends: [
+        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+      ],
+      rules: {
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          { argsIgnorePattern: '^_' },
+        ],
+      },
+    },
+  ],
 };
