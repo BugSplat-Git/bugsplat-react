@@ -3,7 +3,7 @@ import {
   CrashApiClient,
   Environment,
 } from '@bugsplat/js-api-client';
-import { render, waitFor, screen } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
 import { ErrorBoundary } from '../../src/ErrorBoundary';
@@ -65,7 +65,7 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
       bugSplat['_fetch'] = globalThis.fetch;
     });
 
-    let result: BugSplatResponse | null;
+    let result: BugSplatResponse | undefined | null;
 
     render(
       <ErrorBoundary
@@ -82,24 +82,16 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
       </ErrorBoundary>
     );
 
-    let alert: HTMLDivElement;
-    let expectedCrashId = -1;
+    await waitFor(() => expect(result).not.toBeUndefined());
 
-    await waitFor(async () => {
-      alert = await screen.findByRole<HTMLDivElement>('alert');
+    if (result?.error !== null) {
+      throw Error('There was a problem with the response');
+    }
 
-      expect(alert).toBeInTheDocument();
-    });
-
-    await waitFor(() => {
-      if (result?.error !== null) {
-        throw result?.error;
-      }
-
-      expectedCrashId = result.response.crash_id;
-    });
-
-    const crashData = await client.getCrashById(database, expectedCrashId);
+    const crashData = await client.getCrashById(
+      database,
+      result.response.crash_id
+    );
 
     expect(crashData.appName).toEqual(application);
     expect(crashData.appVersion).toEqual(version);
