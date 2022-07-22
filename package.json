@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "test": "jest --selectProjects unit",
-    "test:integration": "env-cmd jest --selectProjects integration",
+    "test:integration": "jest --selectProjects integration",
+    "test:all": "jest",
     "build": "tsc -p ./tsconfig.build.json",
     "prepare": "npm run build",
     "format": "prettier --write src/"
@@ -32,7 +33,7 @@
     "@types/react-dom": "^18.0.5",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
-    "env-cmd": "^10.1.0",
+    "dotenv": "^16.0.1",
     "eslint": "^8.17.0",
     "eslint-plugin-react": "^7.30.0",
     "eslint-plugin-react-hooks": "^4.6.0",

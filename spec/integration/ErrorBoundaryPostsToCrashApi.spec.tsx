@@ -8,6 +8,12 @@ import { BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
 import { ErrorBoundary } from '../../src/ErrorBoundary';
 import { init } from '../../src/appScope';
+import dotenv from 'dotenv';
+
+/**
+ * Load environment variables from .env file
+ */
+dotenv.config();
 
 const appBaseUrl = 'https://app.bugsplat.com';
 
