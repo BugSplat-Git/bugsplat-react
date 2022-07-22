@@ -17,14 +17,14 @@ dotenv.config();
 
 const appBaseUrl = 'https://app.bugsplat.com';
 
-const email = process.env.EMAIL;
+const email = process.env.BUGSPLAT_CLIENT_ID;
 if (!email) {
-  throw new Error('`EMAIL` environment variable must be set!');
+  throw new Error('`BUGSPLAT_CLIENT_ID` environment variable must be set!');
 }
 
-const password = process.env.PASSWORD;
+const password = process.env.BUGSPLAT_CLIENT_SECRET;
 if (!password) {
-  throw new Error('`PASSWORD` environment variable must be set!');
+  throw new Error('`BUGSPLAT_CLIENT_SECRET` environment variable must be set!');
 }
 
 const BlowUpError = new Error('Error thrown during render.');
