@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  EMAIL: ${{ secrets.TEST_EMAIL }}
+  PASSWORD: ${{ secrets.TEST_PASSWORD }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
