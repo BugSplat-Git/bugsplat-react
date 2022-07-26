@@ -20,11 +20,9 @@ BugSplat supports the collection of errors in React applications. The
 @bugsplat/react npm package implements an
 [ErrorBoundary](https://reactjs.org/docs/error-boundaries.html)
 component in order to capture rendering errors in child components and
-post them to BugSplat where they can be tracked and managed. The package
-also includes a [React context](https://reactjs.org/docs/context.html)
-provider and additional utilities to tailor BugSplat to the needs of
-your application. Adding BugSplat to your React application is extremely
-easy. Before getting started please complete the following tasks:
+post them to BugSplat where they can be tracked and managed. Adding BugSplat
+to your React application is extremely easy. Before getting started please
+complete the following tasks:
 
 - [Sign up](https://app.bugsplat.com/v2/sign-up) for BugSplat
 - Create a new
@@ -37,8 +35,8 @@ easy. Before getting started please complete the following tasks:
 ## Get Started
 
 To start using BugSplat in your React application, run the following command
-at the root of your project. This will install @bugsplat/react and its sub
-dependency [bugsplat](https://github.com/BugSplat-Git/bugsplat-js).
+at the root of your project. This will install @bugsplat/react and it's
+sub-dependency, [bugsplat](https://github.com/BugSplat-Git/bugsplat-js).
 
 ```shell
 npm i @bugsplat/react --save
