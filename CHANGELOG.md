@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/BugSplat-Git/bugsplat-react/compare/v1.0.0...v1.0.1) (2022-07-26)
+
+
+### Bug Fixes
+
+* **cd:** change access to public ([e667421](https://github.com/BugSplat-Git/bugsplat-react/commit/e667421212092390891651088f01e04ffad5d773))
+* **cd:** MIT license ([8d9a151](https://github.com/BugSplat-Git/bugsplat-react/commit/8d9a15123170208729696c76cf23bb38d6790875))
+
 # 1.0.0 (2022-07-26)
 
 
