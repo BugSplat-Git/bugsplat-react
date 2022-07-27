@@ -25,10 +25,13 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['src/**/*.ts?(x)', 'spec/**/*.ts?(x)'],
+      files: ['**/*.ts?(x)'],
       parser: '@typescript-eslint/parser',
       parserOptions: {
-        project: 'tsconfig.json',
+        project: [
+          './tsconfig.json',
+          './examples/my-react-crasher/tsconfig.json',
+        ],
         tsconfigRootDir: __dirname,
         ecmaVersion: 13,
         sourceType: 'module',

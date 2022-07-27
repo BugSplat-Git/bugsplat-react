@@ -1,0 +1,31 @@
+{
+  "name": "my-react-crasher",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "test": "jest",
+    "symbol-upload": "env-cmd symbol-upload -d ./build/static/js",
+    "start:build": "npm run build && npm run symbol-upload && http-server ./build"
+  },
+  "dependencies": {
+    "@bugsplat/react": "^1.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@bugsplat/symbol-upload": "^4.1.1",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@types/jest": "^28.1.6",
+    "@types/node": "^18.6.1",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@vitejs/plugin-react": "^2.0.0",
+    "env-cmd": "^10.1.0",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4",
+    "vite": "^3.0.3"
+  }
+}
