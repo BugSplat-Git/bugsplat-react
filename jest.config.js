@@ -19,7 +19,7 @@ module.exports = {
   projects: [
     {
       displayName: 'unit',
-      testPathIgnorePatterns: ['spec/integration'],
+      testPathIgnorePatterns: ['spec/integration', 'examples'],
       ...baseConfig,
     },
     {
