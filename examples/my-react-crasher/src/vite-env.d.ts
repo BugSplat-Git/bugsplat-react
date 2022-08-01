@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly BUGSPLAT_DATABASE: string;
+  readonly BUGSPLAT_DATABASE?: string;
 }
 
 interface ImportMeta {

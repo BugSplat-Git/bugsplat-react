@@ -19,12 +19,7 @@ BugSplat database in place of `{{database}}`.
 SYMBOL_UPLOAD_CLIENT_ID={{clientId}}
 SYMBOL_UPLOAD_CLIENT_SECRET={{clientSecret}}
 BUGSPLAT_DATABASE={{database}}
-VITE_BUGSPLAT_DATABASE=$BUGSPLAT_DATABASE
 ```
-
-`BUGSPLAT_DATABASE` is used by
-[@bugsplat/symbol-upload](https://www.npmjs.com/package/@bugsplat/symbol-upload)
-but we also need it to be picked up automatically by our build tool
 
 ## Install
 
