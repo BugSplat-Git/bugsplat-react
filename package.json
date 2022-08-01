@@ -19,10 +19,11 @@
     "examples/*"
   ],
   "scripts": {
-    "test": "jest --selectProjects unit",
+    "test": "npm run test:unit",
     "test:integration": "jest --selectProjects integration",
+    "test:unit": "jest --selectProjects unit",
     "test:all": "jest",
-    "build": "tsc --build",
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
     "prepare": "npm run build",
     "format": "prettier --write src/"
   },
@@ -50,6 +51,7 @@
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
     "prettier": "^2.7.0",
+    "rimraf": "^3.0.2",
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.3"
   },

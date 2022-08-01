@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "useDefineForClassFields": true
+  },
+  "extends": "./tsconfig.json",
+  "exclude": ["spec", "jest.config.mjs"]
+}

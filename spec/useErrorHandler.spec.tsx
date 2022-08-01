@@ -34,7 +34,7 @@ describe('useErrorHandler hook used in child of ErrorBoundary', () => {
       );
     }
 
-    render(
+    render( 
       <ErrorBoundary fallback={Fallback}>
         <AsyncComponent />
       </ErrorBoundary>
