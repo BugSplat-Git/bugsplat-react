@@ -15,6 +15,9 @@ module.exports = {
     'plugin:react-hooks/recommended',
   ],
   plugins: ['react', 'react-hooks'],
+  parserOptions: {
+    sourceType: 'module',
+  },
   rules: {
     'react/sort-comp': 1,
   },

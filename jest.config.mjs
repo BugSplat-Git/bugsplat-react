@@ -1,8 +1,3 @@
-/* eslint-env node */
-
-/**
- * @type {import('@jest/types').Config.InitialOptions}
- */
 const baseConfig = {
   coverageProvider: 'v8',
   globals: { fetch, FormData, Blob },
@@ -11,10 +6,7 @@ const baseConfig = {
   testEnvironment: 'jsdom',
 };
 
-/**
- * @type {import('@jest/types').Config.InitialOptions}
- */
-module.exports = {
+const jestConfig = {
   ...baseConfig,
   projects: [
     {
@@ -29,3 +21,5 @@ module.exports = {
     },
   ],
 };
+
+export default jestConfig;

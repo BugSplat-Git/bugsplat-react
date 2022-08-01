@@ -12,8 +12,9 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "strict": true,
+    "sourceMap": true,
     "target": "ESNext",
     "useDefineForClassFields": true
   },
-  "include": ["src", "spec", "vite.config.ts"]
+  "include": ["src", "spec", "jest.config.mjs"]
 }
