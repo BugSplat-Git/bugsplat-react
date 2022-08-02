@@ -28,12 +28,10 @@ complete the following tasks:
 - Create a new
   [database](https://app.bugsplat.com/v2/settings/company/databases)
   for your application
-
-Check out the
+- Check out the
 [live demo](https://www.bugsplat.com/platforms/react/my-react-crasher)
-of BugSplat’s error reporting for React. The source code for the demo
-can be found in this repository at
-[/examples/my-react-crasher](/examples/my-react-crasher).
+of BugSplat’s error reporting for React.
+  - source: [/examples/my-react-crasher](/examples/my-react-crasher).
 
 ## Get Started
 
