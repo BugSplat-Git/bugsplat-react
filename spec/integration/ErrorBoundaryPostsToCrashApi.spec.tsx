@@ -6,8 +6,11 @@ import {
 import { render, waitFor } from '@testing-library/react';
 import { BugSplatResponse } from 'bugsplat';
 import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
-import { ErrorBoundary } from '../../src/ErrorBoundary';
+import dotenv from 'dotenv';
 import { init } from '../../src/appScope';
+import { ErrorBoundary } from '../../src/ErrorBoundary';
+
+dotenv.config();
 
 const appBaseUrl = 'https://app.bugsplat.com';
 
