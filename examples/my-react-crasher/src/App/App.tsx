@@ -39,8 +39,8 @@ function App() {
       <div className={styles.content}>
         <h1>Welcome to my-react-crasher</h1>
         <p>
-          This is a sample application that demonstrates
-          <Link href={BUGSPLAT_URL}>BugSplat</Link> error reporting for
+          This is a sample application that demonstrates{' '}
+          <Link href={BUGSPLAT_URL}>BugSplat</Link> error reporting for{' '}
           <Link href={DOCS_REACT_URL}>React</Link> applications built with
           JavaScript or TypeScript.
         </p>

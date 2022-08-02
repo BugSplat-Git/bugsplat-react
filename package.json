@@ -25,7 +25,8 @@
     "test:all": "jest",
     "build": "rimraf dist && tsc -p tsconfig.build.json",
     "prepare": "npm run build",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "start:my-react-crasher": "npm run -w my-react-crasher start"
   },
   "keywords": [
     "bugsplat",
