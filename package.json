@@ -24,6 +24,7 @@
     "test:unit": "jest --selectProjects unit",
     "test:all": "jest",
     "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "build:examples": "npm run build -w examples/",
     "prepare": "npm run build",
     "format": "prettier --write src/",
     "start:my-react-crasher": "npm run -w my-react-crasher start"
