@@ -1,11 +1,17 @@
+/**
+ * @type {import('jest').Config}
+ */
 const baseConfig = {
   coverageProvider: 'v8',
   globals: { fetch, FormData, Blob },
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   setupFilesAfterEnv: ['<rootDir>/spec/setupTests.ts'],
   testEnvironment: 'jsdom',
 };
 
+/**
+ * @type {import('jest').Config}
+ */
 const jestConfig = {
   ...baseConfig,
   projects: [

@@ -16,12 +16,17 @@ const appBaseUrl = 'https://app.bugsplat.com';
 
 const email = process.env.BUGSPLAT_CLIENT_ID;
 if (!email) {
-  throw new Error('`BUGSPLAT_CLIENT_ID` environment variable must be set!');
+  throw new Error('Environment variable `BUGSPLAT_CLIENT_ID` must be set!');
 }
 
 const password = process.env.BUGSPLAT_CLIENT_SECRET;
 if (!password) {
-  throw new Error('`BUGSPLAT_CLIENT_SECRET` environment variable must be set!');
+  throw new Error('Environment variable `BUGSPLAT_CLIENT_SECRET` must be set!');
+}
+
+const database = process.env.BUGSPLAT_DATABASE;
+if (!database) {
+  throw new Error('Environment variable `BUGSPLAT_DATABASE` must be set!');
 }
 
 const BlowUpError = new Error('Error thrown during render.');
@@ -40,7 +45,6 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
   });
 
   it('should post a crash report with all the provided information', async () => {
-    const database = 'fred';
     const application = 'my-react-crasher';
     const version = '3.2.1';
     const appKey = 'Key!';
