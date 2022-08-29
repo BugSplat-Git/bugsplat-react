@@ -6,8 +6,8 @@
     "start": "vite",
     "build": "vite build",
     "test": "vitest",
-    "symbol-upload": "env-cmd symbol-upload -d ./dist/static/js",
-    "start:build": "vite build && npm run symbol-upload && vite ./dist"
+    "symbol-upload": "env-cmd symbol-upload -d ./dist/assets",
+    "start:build": "vite build && npm run symbol-upload && vite preview"
   },
   "dependencies": {
     "@bugsplat/react": "^1.0.1",
