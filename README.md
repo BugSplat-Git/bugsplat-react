@@ -31,7 +31,6 @@ complete the following tasks:
 - Check out the
 [live demo](https://www.bugsplat.com/platforms/react/my-react-crasher)
 of BugSplat’s error reporting for React.
-  - source: [/examples/my-react-crasher](/examples/my-react-crasher).
 
 ## Get Started
 
