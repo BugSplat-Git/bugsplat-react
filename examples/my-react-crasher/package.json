@@ -1,14 +1,4 @@
 {
-  "name": "my-react-crasher",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "test": "vitest",
-    "symbol-upload": "env-cmd symbol-upload -d ./dist/assets",
-    "start:build": "vite build && npm run symbol-upload && vite preview"
-  },
   "dependencies": {
     "@bugsplat/react": "^1.0.1",
     "react": "^18.2.0",
@@ -27,5 +17,14 @@
     "typescript": "^4.7.4",
     "vite": "^3.0.3",
     "vitest": "^0.19.1"
-  }
+  },
+  "name": "my-react-crasher",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "start": "vite build && npm run symbol-upload && vite preview",
+    "symbol-upload": "env-cmd symbol-upload -d ./dist/assets",
+    "test": "vitest"
+  },
+  "version": "1.0.0"
 }

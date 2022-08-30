@@ -1,4 +1,6 @@
 {
   "typescript.tsdk": "node_modules\\typescript\\lib",
-  "jest.jestCommandLine": "npm run test --"
+  "jest.jestCommandLine": "npm run test --",
+  "json.format.enable": true,
+  "sortJSON.excludedFiles": ["package.json"]
 }
