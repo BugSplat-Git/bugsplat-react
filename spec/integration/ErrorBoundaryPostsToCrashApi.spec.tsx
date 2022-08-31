@@ -1,8 +1,7 @@
 import {
-  BugSplatApiClient,
-  CrashApiClient
+  CrashApiClient, OAuthClientCredentialsClient
 } from '@bugsplat/js-api-client';
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { BugSplatResponse, BugSplatResponseBody } from 'bugsplat';
 import dotenv from 'dotenv';
 import { init } from '../../src/appScope';
@@ -35,8 +34,8 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
   let client: CrashApiClient;
 
   beforeEach(async () => {
-    const api = await BugSplatApiClient.createAuthenticatedClientForNode(clientId, clientSecret);
-    client = new CrashApiClient(api);
+    const api = await OAuthClientCredentialsClient.createAuthenticatedClient(clientId, clientSecret)
+    client = new CrashApiClient(api); 
   });
 
   it('should post a crash report with all the provided information', async () => {
@@ -78,6 +77,7 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
       </ErrorBoundary>
     );
 
+    await waitFor(() => screen.findByRole('alert'))
     await waitFor(() => expect(result).not.toBeUndefined());
 
     if (result?.error !== null) {
