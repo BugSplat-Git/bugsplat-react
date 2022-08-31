@@ -29,8 +29,8 @@ complete the following tasks:
   [database](https://app.bugsplat.com/v2/settings/company/databases)
   for your application
 - Check out the
-  [live demo](https://www.bugsplat.com/platforms/react/my-react-crasher)
-  of BugSplat’s error reporting for React
+[live demo](https://bugsplat-git.github.io/my-react-crasher/)
+or view a [sample implementation](/examples/my-react-crasher) of BugSplat’s error reporting for React
 
 ## Get Started
 

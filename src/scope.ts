@@ -1,4 +1,4 @@
-import { BugSplat } from 'bugsplat';
+import type { BugSplat } from 'bugsplat';
 
 /**
  * Encapsulate BugSplat client instance

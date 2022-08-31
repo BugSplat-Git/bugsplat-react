@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "noEmit": false,
-    "noEmitOnError": true,
-    "outDir": "./dist",
-    "sourceMap": true
+    "outDir": "dist",
+    "sourceMap": true,
+    "useDefineForClassFields": true
   },
-  "exclude": ["spec"],
-  "extends": "./tsconfig.json"
+  "extends": "./tsconfig.json",
+  "exclude": ["spec", "jest.config.mjs"]
 }

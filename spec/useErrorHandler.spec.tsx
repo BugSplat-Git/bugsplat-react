@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
 import { useEffect, useState } from 'react';
 import { useErrorHandler, ErrorBoundary, FallbackProps } from '../src';
+import { fireEvent, render, screen } from './testUtils';
 
 function Fallback({ error, resetErrorBoundary }: FallbackProps) {
   return (

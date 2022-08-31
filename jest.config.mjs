@@ -1,25 +1,23 @@
-/* eslint-env node */
-
 /**
- * @type {import('@jest/types').Config.InitialOptions}
+ * @type {import('jest').Config}
  */
 const baseConfig = {
   coverageProvider: 'v8',
   globals: { fetch, FormData, Blob },
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   setupFilesAfterEnv: ['<rootDir>/spec/setupTests.ts'],
   testEnvironment: 'jsdom',
 };
 
 /**
- * @type {import('@jest/types').Config.InitialOptions}
+ * @type {import('jest').Config}
  */
-module.exports = {
+const jestConfig = {
   ...baseConfig,
   projects: [
     {
       displayName: 'unit',
-      testPathIgnorePatterns: ['spec/integration'],
+      testPathIgnorePatterns: ['spec/integration', 'examples'],
       ...baseConfig,
     },
     {
@@ -29,3 +27,5 @@ module.exports = {
     },
   ],
 };
+
+export default jestConfig;

@@ -6,15 +6,16 @@ on:
       - main
 
 env:
-  BUGSPLAT_CLIENT_ID: ${{ secrets.BUGSPLAT_CLIENT_ID }}
-  BUGSPLAT_CLIENT_SECRET: ${{ secrets.BUGSPLAT_CLIENT_SECRET }}
+  BUGSPLAT_DATABASE: bugsplat_react
+  BUGSPLAT_CLIENT_ID: b8fbe5e4e915ddc9838cf186df1fe636
+  BUGSPLAT_CLIENT_SECRET: w4UHnUa104bnbQEfQ8gnxhRTshHaVss5
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16]
+        node-version: [18]
     steps:
       - name: Checkout
         uses: actions/checkout@v3

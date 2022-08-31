@@ -1,31 +1,29 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { BugSplat, BugSplatOptions, BugSplatResponse } from 'bugsplat';
+import { jest } from '@jest/globals';
+import {
+  BugSplat,
+  type BugSplatOptions,
+  type BugSplatResponse,
+} from 'bugsplat';
 import { useState } from 'react';
 import { ErrorBoundary } from '../src/ErrorBoundary';
 import { Scope } from '../src/scope';
+import { fireEvent, render, screen, waitFor } from './testUtils';
 
-export const mockPost = jest.fn(
+const mockPost = jest.fn(
   async (_errorToPost: string | Error, _options?: BugSplatOptions) =>
     new Promise<BugSplatResponse>((resolve) => resolve({} as BugSplatResponse))
 );
 
-const MockBugSplat = jest.fn(function (
-  this: BugSplat,
-  ..._args: ConstructorParameters<typeof BugSplat>
-) {
-  this.post = mockPost;
-
-  return this;
-});
-
-const BlowUpError = new Error('Error thrown during render.');
-
 function BlowUp(): JSX.Element {
-  throw BlowUpError;
+  throw new Error('Error thrown during render.');
+}
+
+function BasicFallback() {
+  return <div role="alert">Error!</div>;
 }
 
 beforeEach(() => {
-  mockPost.mockClear();
+  mockPost.mockReset();
 });
 
 describe('<ErrorBoundary />', () => {
@@ -35,8 +33,7 @@ describe('<ErrorBoundary />', () => {
         <div>Child Div</div>
       </ErrorBoundary>
     );
-    const childDiv = screen.queryByText('Child Div');
-    expect(childDiv).toBeInTheDocument();
+    screen.getByText('Child Div');
   });
 
   it('calls onMount when mounted', () => {
@@ -66,13 +63,26 @@ describe('<ErrorBoundary />', () => {
   });
 
   describe('when a rendering error has occurred', () => {
-    it('should not call BugSplat callbacks if no instance is present', () => {
-      const mockBeforePost = jest.fn();
+    const mockBeforePost = jest.fn(
+      (_b: BugSplat, _e: Error | null, _c: string | null) => {
+        /**
+         * EMPTY *
+         */
+      }
+    );
+
+    beforeEach(() => {
+      mockBeforePost.mockReset();
+    });
+
+    it('should not call BugSplat callbacks if no instance is present', async () => {
       render(
-        <ErrorBoundary beforePost={mockBeforePost}>
+        <ErrorBoundary beforePost={mockBeforePost} fallback={BasicFallback}>
           <BlowUp />
         </ErrorBoundary>
       );
+
+      await screen.findByRole('alert');
 
       expect(mockPost).toHaveBeenCalledTimes(0);
       expect(mockBeforePost).toHaveBeenCalledTimes(0);
@@ -83,28 +93,51 @@ describe('<ErrorBoundary />', () => {
       let scope: Pick<Scope, 'getClient'>;
 
       beforeEach(() => {
-        bugSplat = new MockBugSplat('db1', 'this app', '3.2.1');
+        bugSplat = {
+          database: '',
+          application: '',
+          version: '',
+          post: mockPost,
+        } as unknown as BugSplat;
         scope = { getClient: () => bugSplat };
       });
 
       it('should call onError', async () => {
-        const mockOnError = jest.fn();
+        const mockOnError = jest.fn(
+          (_e: Error, _c: string, _r: BugSplatResponse | null) => {
+            /**
+             * EMPTY *
+             */
+          }
+        );
         render(
-          <ErrorBoundary onError={mockOnError} scope={scope}>
+          <ErrorBoundary
+            onError={mockOnError}
+            scope={scope}
+            fallback={BasicFallback}
+          >
             <BlowUp />
           </ErrorBoundary>
         );
 
-        await waitFor(() => expect(mockOnError).toHaveBeenCalledTimes(1));
+        await screen.findByRole('alert');
+
+        expect(mockOnError).toHaveBeenCalledTimes(1);
       });
 
-      it('should not post if disablePost is set to true', () => {
-        const mockBeforePost = jest.fn();
+      it('should not post if disablePost is set to true', async () => {
         render(
-          <ErrorBoundary disablePost beforePost={mockBeforePost} scope={scope}>
+          <ErrorBoundary
+            disablePost
+            beforePost={mockBeforePost}
+            scope={scope}
+            fallback={BasicFallback}
+          >
             <BlowUp />
           </ErrorBoundary>
         );
+
+        await screen.findByRole('alert');
 
         expect(mockPost).toHaveBeenCalledTimes(0);
         expect(mockBeforePost).toHaveBeenCalledTimes(0);
@@ -112,52 +145,58 @@ describe('<ErrorBoundary />', () => {
 
       it('should call BugSplat.post', async () => {
         render(
-          <ErrorBoundary scope={scope}>
+          <ErrorBoundary scope={scope} fallback={BasicFallback}>
             <BlowUp />
           </ErrorBoundary>
         );
+
+        await screen.findByRole('alert');
 
         await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
       });
 
       it('should call beforePost', async () => {
-        const mockBeforePost = jest.fn();
         render(
-          <ErrorBoundary beforePost={mockBeforePost} scope={scope}>
+          <ErrorBoundary
+            beforePost={mockBeforePost}
+            scope={scope}
+            fallback={BasicFallback}
+          >
             <BlowUp />
           </ErrorBoundary>
         );
 
-        await waitFor(() => expect(mockBeforePost).toHaveBeenCalledTimes(1));
         await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+
+        expect(mockBeforePost).toHaveBeenCalledTimes(1);
       });
     });
 
-    it('should render a basic fallback element', () => {
+    it('should render a basic fallback element', async () => {
       render(
-        <ErrorBoundary fallback={<p>This is fallback</p>}>
+        <ErrorBoundary fallback={<p role="alert">This is fallback</p>}>
           <div>Child Div</div>
           <BlowUp />
         </ErrorBoundary>
       );
 
+      await screen.findByText('This is fallback');
       expect(screen.queryByText('Child Div')).not.toBeInTheDocument();
-      expect(screen.queryByText('This is fallback')).toBeInTheDocument();
     });
 
-    it('should render a fallback render prop', () => {
+    it('should render a fallback render prop', async () => {
       render(
-        <ErrorBoundary fallback={() => <p>This is fallback</p>}>
+        <ErrorBoundary fallback={() => <p role="alert">This is fallback</p>}>
           <div>Child Div</div>
           <BlowUp />
         </ErrorBoundary>
       );
 
+      await screen.findByText('This is fallback');
       expect(screen.queryByText('Child Div')).not.toBeInTheDocument();
-      expect(screen.queryByText('This is fallback')).toBeInTheDocument();
     });
 
-    it('should call onReset with extra args passed from resetErrorBoundary', () => {
+    it('should call onReset with extra args passed from resetErrorBoundary', async () => {
       const TRY_AGAIN_ARGS = ['TRY_AGAIN_ARG1', 'TRY_AGAIN_ARG2'];
       const mockOnReset = jest.fn();
 
@@ -174,8 +213,13 @@ describe('<ErrorBoundary />', () => {
         </ErrorBoundary>
       );
 
-      fireEvent.click(screen.getByText('Try Again'));
-      expect(mockOnReset.mock.lastCall).toContain(TRY_AGAIN_ARGS[0]);
+      await screen.findByText(/try again/i);
+
+      fireEvent.click(screen.getByText(/try again/i));
+
+      await waitFor(() =>
+        expect(mockOnReset.mock.lastCall).toContain(TRY_AGAIN_ARGS[0])
+      );
       expect(mockOnReset.mock.lastCall).toContain(TRY_AGAIN_ARGS[1]);
     });
 

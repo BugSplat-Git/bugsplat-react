@@ -2,30 +2,45 @@
   "configurations": [
     {
       "type": "node",
-      "name": "vscode-jest-integration-tests",
-      "request": "launch",
-      "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
-      "cwd": "${workspaceFolder}",
-      "runtimeExecutable": "npm",
-      "args": [
-        "run",
-        "test:integration",
-        "--",
-        "--runInBand",
-        "--watchAll=false"
-      ]
-    },
-    {
-      "type": "node",
-      "name": "vscode-jest-tests",
+      "name": "vscode-jest-tests.v2-1659480590861",
       "request": "launch",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
       "cwd": "${workspaceFolder}",
       "runtimeExecutable": "npm",
-      "args": ["run", "test", "--", "--runInBand", "--watchAll=false"]
+      "args": [
+        "run",
+        "test",
+        "--",
+        "--runInBand",
+        "--watchAll=false",
+        "--testNamePattern",
+        "${jest.testNamePattern}",
+        "--runTestsByPath",
+        "${jest.testFile}"
+      ]
+    },
+    {
+      "type": "node",
+      "name": "vscode-jest-tests.v2",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "disableOptimisticBPs": true,
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "args": [
+        "run",
+        "test",
+        "--",
+        "--runInBand",
+        "--watchAll=false",
+        "--testNamePattern",
+        "${jest.testNamePattern}",
+        "--runTestsByPath",
+        "${jest.testFile}"
+      ]
     }
   ]
 }

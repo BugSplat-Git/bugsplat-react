@@ -1,30 +1,27 @@
 import {
-  BugSplatApiClient,
-  CrashApiClient,
-  Environment,
+  CrashApiClient, OAuthClientCredentialsClient
 } from '@bugsplat/js-api-client';
-import { render, waitFor } from '@testing-library/react';
-import { BugSplatResponse } from 'bugsplat';
-import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
-import { ErrorBoundary } from '../../src/ErrorBoundary';
-import { init } from '../../src/appScope';
+import { render, screen, waitFor } from '@testing-library/react';
+import { BugSplatResponse, BugSplatResponseBody } from 'bugsplat';
 import dotenv from 'dotenv';
+import { init } from '../../src/appScope';
+import { ErrorBoundary } from '../../src/ErrorBoundary';
 
-/**
- * Load environment variables from .env file
- */
 dotenv.config();
 
-const appBaseUrl = 'https://app.bugsplat.com';
-
-const email = process.env.BUGSPLAT_CLIENT_ID;
-if (!email) {
-  throw new Error('`BUGSPLAT_CLIENT_ID` environment variable must be set!');
+const clientId = process.env.BUGSPLAT_CLIENT_ID;
+if (!clientId) {
+  throw new Error('Environment variable `BUGSPLAT_CLIENT_ID` must be set!');
 }
 
-const password = process.env.BUGSPLAT_CLIENT_SECRET;
-if (!password) {
-  throw new Error('`BUGSPLAT_CLIENT_SECRET` environment variable must be set!');
+const clientSecret = process.env.BUGSPLAT_CLIENT_SECRET;
+if (!clientSecret) {
+  throw new Error('Environment variable `BUGSPLAT_CLIENT_SECRET` must be set!');
+}
+
+const database = process.env.BUGSPLAT_DATABASE;
+if (!database) {
+  throw new Error('Environment variable `BUGSPLAT_DATABASE` must be set!');
 }
 
 const BlowUpError = new Error('Error thrown during render.');
@@ -37,13 +34,11 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
   let client: CrashApiClient;
 
   beforeEach(async () => {
-    const apiClient = new BugSplatApiClient(appBaseUrl, Environment.Node);
-    await apiClient.login(email, password);
-    client = new CrashApiClient(apiClient);
+    const api = await OAuthClientCredentialsClient.createAuthenticatedClient(clientId, clientSecret)
+    client = new CrashApiClient(api); 
   });
 
   it('should post a crash report with all the provided information', async () => {
-    const database = 'fred';
     const application = 'my-react-crasher';
     const version = '3.2.1';
     const appKey = 'Key!';
@@ -82,6 +77,7 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
       </ErrorBoundary>
     );
 
+    await waitFor(() => screen.findByRole('alert'))
     await waitFor(() => expect(result).not.toBeUndefined());
 
     if (result?.error !== null) {

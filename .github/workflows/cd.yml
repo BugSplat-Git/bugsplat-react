@@ -22,6 +22,9 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Build Examples
+        run: npm run build:examples
+
       - name: Semantic Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -33,3 +36,12 @@ jobs:
           -p @semantic-release/exec@6
           -p @semantic-release/git@10
           semantic-release
+
+      - name: Deploy My React Crasher 🚀
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          repository-name: BugSplat-Git/bugsplat-git.github.io
+          branch: gh-pages
+          folder: examples/my-react-crasher/dist
+          target-folder: my-react-crasher
+          token: ${{ secrets.GH_TOKEN }}

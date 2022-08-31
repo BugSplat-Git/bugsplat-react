@@ -1,0 +1,77 @@
+a {
+  color: #007bff;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+a,
+button {
+  transition: 220ms all ease-in-out;
+}
+
+button {
+  border: none;
+  background: #fff;
+  font-family: inherit;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  transition-property: background-color;
+}
+
+button:hover {
+  background: rgb(245, 245, 245);
+}
+
+button:focus {
+  border: 3px solid #007bff;
+}
+
+a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+h1,
+h2 {
+  color: #007bff;
+}
+
+.logo {
+  width: 60%;
+  padding: 15px;
+}
+
+.root {
+  text-align: center;
+  margin: 0 auto;
+  max-width: 700px;
+}
+
+.content {
+  background: #fff;
+  box-shadow: 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
+  padding-top: 5px;
+  overflow-y: auto;
+}
+
+.content p {
+  padding: 0 24px;
+}
+
+.errors {
+  margin-top: 5px;
+  background: rgb(225, 225, 225);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+button.error > h4 {
+  margin-top: 0;
+}
