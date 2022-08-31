@@ -1,26 +1,22 @@
 import {
   BugSplatApiClient,
-  CrashApiClient,
-  Environment,
+  CrashApiClient
 } from '@bugsplat/js-api-client';
 import { render, waitFor } from '@testing-library/react';
-import { BugSplatResponse } from 'bugsplat';
-import { BugSplatResponseBody } from 'bugsplat/dist/cjs/bugsplat-response';
+import { BugSplatResponse, BugSplatResponseBody } from 'bugsplat';
 import dotenv from 'dotenv';
 import { init } from '../../src/appScope';
 import { ErrorBoundary } from '../../src/ErrorBoundary';
 
 dotenv.config();
 
-const appBaseUrl = 'https://app.bugsplat.com';
-
-const email = process.env.BUGSPLAT_CLIENT_ID;
-if (!email) {
+const clientId = process.env.BUGSPLAT_CLIENT_ID;
+if (!clientId) {
   throw new Error('Environment variable `BUGSPLAT_CLIENT_ID` must be set!');
 }
 
-const password = process.env.BUGSPLAT_CLIENT_SECRET;
-if (!password) {
+const clientSecret = process.env.BUGSPLAT_CLIENT_SECRET;
+if (!clientSecret) {
   throw new Error('Environment variable `BUGSPLAT_CLIENT_SECRET` must be set!');
 }
 
@@ -39,9 +35,8 @@ describe('ErrorBoundary posts a caught rendering error to BugSplat', () => {
   let client: CrashApiClient;
 
   beforeEach(async () => {
-    const apiClient = new BugSplatApiClient(appBaseUrl, Environment.Node);
-    await apiClient.login(email, password);
-    client = new CrashApiClient(apiClient);
+    const api = await BugSplatApiClient.createAuthenticatedClientForNode(clientId, clientSecret);
+    client = new CrashApiClient(api);
   });
 
   it('should post a crash report with all the provided information', async () => {
