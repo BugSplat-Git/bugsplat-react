@@ -285,9 +285,6 @@ function App() {
 
 ## API
 
-This package re-exports all exports from
-[bugsplat-js](https://github.com/BugSplat-Git/bugsplat-js).
-
 ### `init()`
 
 ```ts
