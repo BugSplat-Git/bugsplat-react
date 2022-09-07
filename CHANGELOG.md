@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/BugSplat-Git/bugsplat-react/compare/v1.0.1...v1.0.2) (2022-09-07)
+
+
+### Bug Fixes
+
+* **examples:** my-react-crasher fails to load ([#6](https://github.com/BugSplat-Git/bugsplat-react/issues/6)) ([16386b8](https://github.com/BugSplat-Git/bugsplat-react/commit/16386b8b9d49ab8c9a11f50ef04ef16e165c0690))
+
 ## [1.0.1](https://github.com/BugSplat-Git/bugsplat-react/compare/v1.0.0...v1.0.1) (2022-07-26)
 
 
