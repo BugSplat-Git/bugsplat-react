@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: Build Examples
-        run: npm run build:examples
+        run: npm run -w my-react-crasher build:pages
 
       - name: Semantic Release
         env:

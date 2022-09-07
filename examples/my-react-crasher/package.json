@@ -22,6 +22,7 @@
   "private": true,
   "scripts": {
     "build": "vite build",
+    "build:pages": "vite build --mode pages",
     "start": "vite build && npm run symbol-upload && vite preview",
     "symbol-upload": "env-cmd symbol-upload -d ./dist/assets",
     "test": "vitest"
