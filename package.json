@@ -1,6 +1,6 @@
 {
   "name": "@bugsplat/react",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "bugsplat utilities for react",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

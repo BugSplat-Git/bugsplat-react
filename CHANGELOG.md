@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/BugSplat-Git/bugsplat-react/compare/v1.0.2...v1.0.3) (2022-09-08)
+
+
+### Bug Fixes
+
+* **examples:** include pages mode environment file ([#8](https://github.com/BugSplat-Git/bugsplat-react/issues/8)) ([8c2ac02](https://github.com/BugSplat-Git/bugsplat-react/commit/8c2ac02d032fc00a7bf98312fa365cce87c8145d))
+
 ## [1.0.2](https://github.com/BugSplat-Git/bugsplat-react/compare/v1.0.1...v1.0.2) (2022-09-07)
 
 
