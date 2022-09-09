@@ -22,7 +22,9 @@
   "private": true,
   "scripts": {
     "build": "vite build",
+    "postbuild": "npm run symbol-upload",
     "build:pages": "vite build --mode pages",
+    "postbuild:pages": "npm run symbol-upload",
     "start": "vite build && npm run symbol-upload && vite preview",
     "symbol-upload": "env-cmd symbol-upload -d ./dist/assets",
     "test": "vitest"
