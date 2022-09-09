@@ -25,6 +25,9 @@ jobs:
       - name: Build Examples
         run: npm run -w my-react-crasher build:pages
 
+      - name: Upload Symbols
+        run: npm run -w my-react-crasher symbol-upload
+
       - name: Semantic Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
