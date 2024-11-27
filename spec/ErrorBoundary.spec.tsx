@@ -1,9 +1,6 @@
 import { jest } from '@jest/globals';
-import {
-  BugSplat,
-  type BugSplatOptions,
-  type BugSplatResponse,
-} from 'bugsplat';
+import { BugSplat } from 'bugsplat';
+import type { BugSplatOptions, BugSplatResponse } from 'bugsplat';
 import { useState } from 'react';
 import { ErrorBoundary } from '../src/ErrorBoundary';
 import { Scope } from '../src/scope';

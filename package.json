@@ -36,7 +36,7 @@
   "author": "zmrl",
   "license": "MIT",
   "dependencies": {
-    "bugsplat": "^7.1.4"
+    "bugsplat": "^8.0.1"
   },
   "devDependencies": {
     "@bugsplat/js-api-client": "^2.0.0",
