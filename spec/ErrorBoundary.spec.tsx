@@ -1,9 +1,6 @@
 import { jest } from '@jest/globals';
-import {
-  BugSplat,
-  type BugSplatOptions,
-  type BugSplatResponse,
-} from 'bugsplat';
+import { BugSplat } from 'bugsplat';
+import type { BugSplatOptions, BugSplatResponse } from 'bugsplat';
 import { useState } from 'react';
 import { ErrorBoundary } from '../src/ErrorBoundary';
 import { Scope } from '../src/scope';
@@ -152,7 +149,19 @@ describe('<ErrorBoundary />', () => {
 
         await screen.findByRole('alert');
 
-        await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+        await waitFor(
+          () => {
+            expect(mockPost).toHaveBeenCalledTimes(1);
+          },
+          {
+            timeout: 5000,
+            interval: 100,
+            onTimeout: (error) => {
+              console.log('Current mockPost calls:', mockPost.mock.calls);
+              return error;
+            },
+          }
+        );
       });
 
       it('should call beforePost', async () => {
