@@ -149,19 +149,7 @@ describe('<ErrorBoundary />', () => {
 
         await screen.findByRole('alert');
 
-        await waitFor(
-          () => {
-            expect(mockPost).toHaveBeenCalledTimes(1);
-          },
-          {
-            timeout: 5000,
-            interval: 100,
-            onTimeout: (error) => {
-              console.log('Current mockPost calls:', mockPost.mock.calls);
-              return error;
-            },
-          }
-        );
+        await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
       });
 
       it('should call beforePost', async () => {
