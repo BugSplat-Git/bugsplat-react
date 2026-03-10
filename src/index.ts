@@ -1,5 +1,6 @@
 export type {
   BugSplat,
+  BugSplatFeedbackOptions,
   BugSplatOptions,
   BugSplatResponse,
   FormDataParam,
@@ -8,4 +9,5 @@ export type {
 export * from './appScope';
 export * from './ErrorBoundary';
 export * from './useErrorHandler';
+export * from './useFeedback';
 export * from './withErrorBoundary';
