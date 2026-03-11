@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { BugSplatFeedbackOptions, BugSplatResponse } from 'bugsplat';
+import type { BugSplatOptions, BugSplatResponse } from 'bugsplat';
 import { getBugSplat } from './appScope';
 
 /**
@@ -17,7 +17,7 @@ export function useFeedback() {
   const [error, setError] = useState<Error | null>(null);
 
   const postFeedback = useCallback(
-    async (title: string, options?: BugSplatFeedbackOptions) => {
+    async (title: string, options?: BugSplatOptions) => {
       const client = getBugSplat();
       if (!client) {
         const err = new Error(

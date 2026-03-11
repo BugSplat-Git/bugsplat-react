@@ -1,9 +1,8 @@
 export type {
   BugSplat,
-  BugSplatFeedbackOptions,
+  BugSplatAttachment,
   BugSplatOptions,
   BugSplatResponse,
-  FormDataParam,
 } from 'bugsplat';
 
 export * from './appScope';

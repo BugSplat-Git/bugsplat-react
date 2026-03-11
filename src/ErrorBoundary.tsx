@@ -1,7 +1,7 @@
 import {
   type BugSplat,
+  type BugSplatAttachment,
   type BugSplatResponse,
-  type FormDataParam,
 } from 'bugsplat';
 import {
   Component,
@@ -28,15 +28,14 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
 }
 
 /**
- * Pack a component stack trace string into an expected object shape
+ * Pack a component stack trace string into an attachment
  */
-function createComponentStackFormDataParam(
+function createComponentStackAttachment(
   componentStack: string
-): FormDataParam {
+): BugSplatAttachment {
   return {
-    key: 'componentStack',
-    value: new Blob([componentStack]),
     filename: 'componentStack.txt',
+    data: new Blob([componentStack]),
   };
 }
 
@@ -256,8 +255,8 @@ export class ErrorBoundary extends Component<
     await beforePost(client, error, componentStack);
 
     return client.post(error, {
-      additionalFormDataParams: [
-        createComponentStackFormDataParam(componentStack),
+      attachments: [
+        createComponentStackAttachment(componentStack),
       ],
     });
   }
