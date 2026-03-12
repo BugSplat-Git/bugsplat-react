@@ -6,6 +6,7 @@ import {
 import {
   Component,
   type ErrorInfo,
+  type JSX,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -165,7 +166,7 @@ export interface ErrorBoundaryState {
   /**
    * Component stack trace of a rendering error; if one occurred.
    */
-  componentStack: ErrorInfo['componentStack'] | null;
+  componentStack: string | null;
   /**
    * Response from most recent BugSplat crash post
    */
@@ -236,8 +237,9 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, { componentStack }: ErrorInfo) {
-    this.setState({ error, componentStack });
-    this.handleError(error, componentStack).catch(console.error);
+    const stack = componentStack ?? null;
+    this.setState({ error, componentStack: stack });
+    this.handleError(error, stack ?? '').catch(console.error);
   }
 
   componentWillUnmount() {

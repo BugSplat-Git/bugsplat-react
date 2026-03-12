@@ -1,0 +1,152 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: #fff;
+  width: 440px;
+  max-width: 90vw;
+  box-shadow: 0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+.header {
+  padding: 20px 24px 12px;
+  text-align: center;
+}
+
+.header h2 {
+  margin: 0;
+  color: #007bff;
+}
+
+.body {
+  padding: 0 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.body label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-align: left;
+  margin-top: 4px;
+}
+
+.body input[type='text'],
+.body textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  border: 2px solid rgb(225, 225, 225);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: 220ms all ease-in-out;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.body input[type='text']:focus,
+.body textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.body textarea {
+  resize: vertical;
+}
+
+.fileUpload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: normal;
+  margin-top: 0;
+}
+
+.fileUpload input[type='file'] {
+  display: none;
+}
+
+.fileBtn {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #007bff;
+  color: #fff;
+  font-size: 0.85rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: 220ms all ease-in-out;
+  white-space: nowrap;
+  border-radius: 4px;
+}
+
+.fileBtn:hover {
+  background: #0056b3;
+}
+
+.fileName {
+  font-size: 0.85rem;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footer {
+  background: rgb(225, 225, 225);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn {
+  padding: 10px 24px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  transition: 220ms all ease-in-out;
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancel {
+  background: #fff;
+  color: #333;
+  border: 2px solid rgb(225, 225, 225);
+}
+
+.cancel:hover {
+  background: rgb(245, 245, 245);
+  border-color: #ccc;
+}
+
+.submit {
+  background: #007bff;
+  color: #fff;
+}
+
+.submit:hover {
+  background: #0056b3;
+}
+
+.submit:disabled {
+  background: #99c9ff;
+  cursor: not-allowed;
+}

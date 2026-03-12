@@ -75,3 +75,25 @@ h2 {
 button.error > h4 {
   margin-top: 0;
 }
+
+.feedback {
+  padding: 0 24px 24px;
+  border-top: 2px solid rgb(225, 225, 225);
+}
+
+.feedbackBtn {
+  padding: 10px 24px;
+  background: #007bff;
+  color: #fff;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 220ms all ease-in-out;
+  width: auto;
+  display: inline-flex;
+}
+
+.feedbackBtn:hover {
+  background: #0056b3;
+}
