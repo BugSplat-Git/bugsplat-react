@@ -16,13 +16,14 @@
 
 ## Introduction
 
-BugSplat supports the collection of errors in React applications. The
+BugSplat supports the collection of errors and user feedback in React applications. The
 @bugsplat/react npm package implements an
 [ErrorBoundary](https://reactjs.org/docs/error-boundaries.html)
 component in order to capture rendering errors in child components and
-post them to BugSplat where they can be tracked and managed. Adding BugSplat
-to your React application is extremely easy. Before getting started please
-complete the following tasks:
+post them to BugSplat where they can be tracked and managed. It also provides
+a `useFeedback` hook for collecting user feedback such as titles, descriptions,
+and file attachments. Adding BugSplat to your React application is extremely
+easy. Before getting started please complete the following tasks:
 
 - [Sign up](https://app.bugsplat.com/v2/sign-up) for BugSplat
 - Create a new
@@ -249,6 +250,65 @@ function App() {
     >
       {}
     </ErrorBoundary>
+  );
+}
+```
+
+## User Feedback
+
+Want to collect user feedback such as titles, descriptions, and file
+attachments? Use the `useFeedback` hook to submit feedback directly to your
+BugSplat dashboard.
+
+```jsx
+// src/FeedbackForm.tsx
+
+import { useState } from 'react';
+import { useFeedback } from '@bugsplat/react';
+
+export default function FeedbackForm() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [files, setFiles] = useState<FileList | null>(null);
+  const { postFeedback, loading, response, error } = useFeedback();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const attachments = files
+      ? Array.from(files).map((file) => ({ filename: file.name, data: file }))
+      : [];
+
+    await postFeedback(title, { description, attachments });
+  };
+
+  if (response) {
+    return <p>Thanks for your feedback!</p>;
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+      <textarea
+        placeholder="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <input
+        type="file"
+        multiple
+        onChange={(e) => setFiles(e.target.files)}
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Submitting...' : 'Send Feedback'}
+      </button>
+      {error && <p>{error.message}</p>}
+    </form>
   );
 }
 ```
@@ -509,6 +569,41 @@ function withErrorBoundary<P extends Record<string, unknown>>(
  * @returns Error handler that will throw when called with a truthy value
  */
 function useErrorHandler(errorProp?: unknown): (error: unknown) => void;
+```
+
+### `useFeedback`
+
+```typescript
+/**
+ * Hook for submitting user feedback to BugSplat.
+ *
+ * @returns Object with `postFeedback` function and `loading`/`response`/`error` state
+ *
+ * @example
+ * const { postFeedback, loading, error } = useFeedback();
+ * await postFeedback('Login button broken', { description: 'Nothing happens when I tap it' });
+ */
+function useFeedback(): {
+  /**
+   * Submit user feedback to BugSplat.
+   *
+   * @param title - Feedback title
+   * @param options - Optional BugSplat options (description, attachments, etc.)
+   */
+  postFeedback: (title: string, options?: BugSplatOptions) => Promise<void>;
+  /**
+   * Whether feedback is currently being submitted
+   */
+  loading: boolean;
+  /**
+   * BugSplat response from the most recent feedback submission
+   */
+  response: BugSplatResponse | null;
+  /**
+   * Error from the most recent feedback submission, if any
+   */
+  error: Error | null;
+};
 ```
 
 ## Test Suite
