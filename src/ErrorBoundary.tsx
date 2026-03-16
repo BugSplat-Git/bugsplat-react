@@ -1,11 +1,12 @@
 import {
   type BugSplat,
+  type BugSplatAttachment,
   type BugSplatResponse,
-  type FormDataParam,
 } from 'bugsplat';
 import {
   Component,
   type ErrorInfo,
+  type JSX,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -28,15 +29,14 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
 }
 
 /**
- * Pack a component stack trace string into an expected object shape
+ * Pack a component stack trace string into an attachment
  */
-function createComponentStackFormDataParam(
+function createComponentStackAttachment(
   componentStack: string
-): FormDataParam {
+): BugSplatAttachment {
   return {
-    key: 'componentStack',
-    value: new Blob([componentStack]),
     filename: 'componentStack.txt',
+    data: new Blob([componentStack]),
   };
 }
 
@@ -166,7 +166,7 @@ export interface ErrorBoundaryState {
   /**
    * Component stack trace of a rendering error; if one occurred.
    */
-  componentStack: ErrorInfo['componentStack'] | null;
+  componentStack: string | null;
   /**
    * Response from most recent BugSplat crash post
    */
@@ -237,8 +237,9 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, { componentStack }: ErrorInfo) {
-    this.setState({ error, componentStack });
-    this.handleError(error, componentStack).catch(console.error);
+    const stack = componentStack ?? null;
+    this.setState({ error, componentStack: stack });
+    this.handleError(error, stack ?? '').catch(console.error);
   }
 
   componentWillUnmount() {
@@ -256,8 +257,8 @@ export class ErrorBoundary extends Component<
     await beforePost(client, error, componentStack);
 
     return client.post(error, {
-      additionalFormDataParams: [
-        createComponentStackFormDataParam(componentStack),
+      attachments: [
+        createComponentStackAttachment(componentStack),
       ],
     });
   }
