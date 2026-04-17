@@ -152,6 +152,23 @@ describe('<ErrorBoundary />', () => {
         await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
       });
 
+      it('should attach componentStack as a plain string (React Native friendly)', async () => {
+        render(
+          <ErrorBoundary scope={scope} fallback={BasicFallback}>
+            <BlowUp />
+          </ErrorBoundary>
+        );
+
+        await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+
+        const [, options] = mockPost.mock.calls[0];
+        expect(options.attachments).toHaveLength(1);
+        const [attachment] = options.attachments;
+        expect(attachment.filename).toBe('componentStack.txt');
+        expect(typeof attachment.data).toBe('string');
+        expect(attachment.data).toContain('BlowUp');
+      });
+
       it('should call beforePost', async () => {
         render(
           <ErrorBoundary

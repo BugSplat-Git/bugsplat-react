@@ -29,14 +29,19 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
 }
 
 /**
- * Pack a component stack trace string into an attachment
+ * Pack a component stack trace string into an attachment.
+ *
+ * The stack is appended as a plain string (not wrapped in a `Blob`) so that
+ * React Native's FormData polyfill — which can't serialize browser `Blob`
+ * objects — can upload it successfully. Browsers accept strings on
+ * `FormData.append()` as well, so this works everywhere.
  */
 function createComponentStackAttachment(
   componentStack: string
 ): BugSplatAttachment {
   return {
     filename: 'componentStack.txt',
-    data: new Blob([componentStack]),
+    data: componentStack,
   };
 }
 
