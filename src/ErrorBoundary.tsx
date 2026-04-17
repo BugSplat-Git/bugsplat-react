@@ -28,20 +28,41 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
   return a.some((item, index) => !Object.is(item, b[index]));
 }
 
+const isReactNative =
+  typeof navigator !== 'undefined' &&
+  (navigator as { product?: string }).product === 'ReactNative';
+
+function utf8ToBase64(text: string): string {
+  const NodeBuffer = (globalThis as { Buffer?: { from(s: string, enc: string): { toString(enc: string): string } } }).Buffer;
+  if (NodeBuffer) {
+    return NodeBuffer.from(text, 'utf-8').toString('base64');
+  }
+  return btoa(unescape(encodeURIComponent(text)));
+}
+
 /**
  * Pack a component stack trace string into an attachment.
  *
- * The stack is appended as a plain string (not wrapped in a `Blob`) so that
- * React Native's FormData polyfill — which can't serialize browser `Blob`
- * objects — can upload it successfully. Browsers accept strings on
- * `FormData.append()` as well, so this works everywhere.
+ * On web we wrap the text in a `Blob` so FormData sends it as a real file
+ * part. On React Native we can't use a `Blob` (RN's FormData polyfill can't
+ * serialize browser Blobs), so we encode the text as a base64 `data:` URI
+ * inside RN's native `{ uri, type }` file shape instead.
  */
 function createComponentStackAttachment(
   componentStack: string
 ): BugSplatAttachment {
+  if (isReactNative) {
+    return {
+      filename: 'componentStack.txt',
+      data: {
+        uri: `data:text/plain;base64,${utf8ToBase64(componentStack)}`,
+        type: 'text/plain',
+      },
+    };
+  }
   return {
     filename: 'componentStack.txt',
-    data: componentStack,
+    data: new Blob([componentStack], { type: 'text/plain' }),
   };
 }
 

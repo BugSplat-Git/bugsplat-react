@@ -152,7 +152,7 @@ describe('<ErrorBoundary />', () => {
         await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
       });
 
-      it('should attach componentStack as a plain string (React Native friendly)', async () => {
+      it('should attach componentStack as a text/plain Blob in browser environments', async () => {
         render(
           <ErrorBoundary scope={scope} fallback={BasicFallback}>
             <BlowUp />
@@ -165,8 +165,8 @@ describe('<ErrorBoundary />', () => {
         expect(options.attachments).toHaveLength(1);
         const [attachment] = options.attachments;
         expect(attachment.filename).toBe('componentStack.txt');
-        expect(typeof attachment.data).toBe('string');
-        expect(attachment.data).toContain('BlowUp');
+        expect(attachment.data).toBeInstanceOf(Blob);
+        expect(attachment.data.type).toBe('text/plain');
       });
 
       it('should call beforePost', async () => {
