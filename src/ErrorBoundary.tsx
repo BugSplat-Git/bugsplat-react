@@ -245,7 +245,7 @@ export class ErrorBoundary extends Component<
 
     return client.post(error, {
       attachments: componentStack
-        ? [{ filename: 'componentStack.txt', data: new Blob([componentStack]) }]
+        ? [{ filename: 'componentStack.txt', data: new Blob([componentStack], { type: 'text/plain' }) }]
         : [],
     });
   }

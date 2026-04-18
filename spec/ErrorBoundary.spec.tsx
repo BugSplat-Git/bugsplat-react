@@ -166,6 +166,7 @@ describe('<ErrorBoundary />', () => {
         const [attachment] = options.attachments;
         expect(attachment.filename).toBe('componentStack.txt');
         expect(attachment.data).toBeInstanceOf(Blob);
+        expect(attachment.data.type).toBe('text/plain');
       });
 
       it('should call beforePost', async () => {
