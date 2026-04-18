@@ -1,6 +1,5 @@
 import {
   type BugSplat,
-  type BugSplatAttachment,
   type BugSplatResponse,
 } from 'bugsplat';
 import {
@@ -11,8 +10,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
-import { appScope } from './appScope';
-import type { Scope } from './scope';
+import { getBugSplat } from './appScope';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -139,7 +137,7 @@ interface InternalErrorBoundaryProps {
    * to pass their own scope that will inject the client for use by
    * ErrorBoundary.
    */
-  scope: Pick<Scope, 'getClient' | 'getCreateComponentStackAttachment'>;
+  scope: { getClient(): BugSplat | null };
 }
 
 export type ErrorBoundaryProps = JSX.LibraryManagedAttributes<
@@ -199,7 +197,7 @@ export class ErrorBoundary extends Component<
     onResetKeysChange: noop,
     onUnmount: noop,
     disablePost: false,
-    scope: appScope,
+    scope: { getClient: getBugSplat },
   };
 
   state = INITIAL_STATE;
@@ -247,7 +245,7 @@ export class ErrorBoundary extends Component<
 
     return client.post(error, {
       attachments: componentStack
-        ? [scope.getCreateComponentStackAttachment()(componentStack)]
+        ? [{ filename: 'componentStack.txt', data: new Blob([componentStack], { type: 'text/plain' }) }]
         : [],
     });
   }

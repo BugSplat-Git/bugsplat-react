@@ -152,7 +152,7 @@ describe('<ErrorBoundary />', () => {
         await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
       });
 
-      it('should attach componentStack as a text/plain Blob by default', async () => {
+      it('should attach componentStack as a Blob', async () => {
         render(
           <ErrorBoundary scope={scope} fallback={BasicFallback}>
             <BlowUp />
@@ -167,24 +167,6 @@ describe('<ErrorBoundary />', () => {
         expect(attachment.filename).toBe('componentStack.txt');
         expect(attachment.data).toBeInstanceOf(Blob);
         expect(attachment.data.type).toBe('text/plain');
-      });
-
-      it('honors scope.getCreateComponentStackAttachment() when provided', async () => {
-        const customAttachment = { filename: 'componentStack.txt', data: 'CUSTOM' };
-        const customBuilder = jest.fn(() => customAttachment);
-        const scopeWithBuilder = new Scope(bugSplat, customBuilder);
-
-        render(
-          <ErrorBoundary scope={scopeWithBuilder} fallback={BasicFallback}>
-            <BlowUp />
-          </ErrorBoundary>
-        );
-
-        await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
-
-        expect(customBuilder).toHaveBeenCalledWith(expect.stringContaining('BlowUp'));
-        const [, options] = mockPost.mock.calls[0];
-        expect(options.attachments).toEqual([customAttachment]);
       });
 
       it('should call beforePost', async () => {
