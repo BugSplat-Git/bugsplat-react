@@ -21,9 +21,9 @@ export interface BugSplatInit {
 }
 
 /**
- * Container for managing shared `BugSplat` instance
+ * Container for the shared `BugSplat` instance and scope-level overrides.
  */
-const appScope: Scope = new Scope();
+export const appScope: Scope = new Scope();
 
 /**
  * Initialize a new BugSplat instance and store the reference in scope

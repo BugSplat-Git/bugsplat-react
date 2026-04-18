@@ -7,6 +7,7 @@ export type {
 
 export * from './appScope';
 export * from './ErrorBoundary';
+export * from './scope';
 export * from './useErrorHandler';
 export * from './useFeedback';
 export * from './withErrorBoundary';

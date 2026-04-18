@@ -87,7 +87,7 @@ describe('<ErrorBoundary />', () => {
 
     describe('when BugSplat has been initialized', () => {
       let bugSplat: BugSplat;
-      let scope: Pick<Scope, 'getClient'>;
+      let scope: Scope;
 
       beforeEach(() => {
         bugSplat = {
@@ -96,7 +96,7 @@ describe('<ErrorBoundary />', () => {
           version: '',
           post: mockPost,
         } as unknown as BugSplat;
-        scope = { getClient: () => bugSplat };
+        scope = new Scope(bugSplat);
       });
 
       it('should call onError', async () => {
@@ -150,6 +150,41 @@ describe('<ErrorBoundary />', () => {
         await screen.findByRole('alert');
 
         await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+      });
+
+      it('should attach componentStack as a text/plain Blob by default', async () => {
+        render(
+          <ErrorBoundary scope={scope} fallback={BasicFallback}>
+            <BlowUp />
+          </ErrorBoundary>
+        );
+
+        await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+
+        const [, options] = mockPost.mock.calls[0];
+        expect(options.attachments).toHaveLength(1);
+        const [attachment] = options.attachments;
+        expect(attachment.filename).toBe('componentStack.txt');
+        expect(attachment.data).toBeInstanceOf(Blob);
+        expect(attachment.data.type).toBe('text/plain');
+      });
+
+      it('honors scope.getCreateComponentStackAttachment() when provided', async () => {
+        const customAttachment = { filename: 'componentStack.txt', data: 'CUSTOM' };
+        const customBuilder = jest.fn(() => customAttachment);
+        const scopeWithBuilder = new Scope(bugSplat, customBuilder);
+
+        render(
+          <ErrorBoundary scope={scopeWithBuilder} fallback={BasicFallback}>
+            <BlowUp />
+          </ErrorBoundary>
+        );
+
+        await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+
+        expect(customBuilder).toHaveBeenCalledWith(expect.stringContaining('BlowUp'));
+        const [, options] = mockPost.mock.calls[0];
+        expect(options.attachments).toEqual([customAttachment]);
       });
 
       it('should call beforePost', async () => {

@@ -11,7 +11,8 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
-import { getBugSplat } from './appScope';
+import { appScope } from './appScope';
+import type { Scope } from './scope';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -26,18 +27,6 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
   }
 
   return a.some((item, index) => !Object.is(item, b[index]));
-}
-
-/**
- * Pack a component stack trace string into an attachment
- */
-function createComponentStackAttachment(
-  componentStack: string
-): BugSplatAttachment {
-  return {
-    filename: 'componentStack.txt',
-    data: new Blob([componentStack]),
-  };
 }
 
 export interface FallbackProps {
@@ -150,7 +139,7 @@ interface InternalErrorBoundaryProps {
    * to pass their own scope that will inject the client for use by
    * ErrorBoundary.
    */
-  scope: { getClient(): BugSplat | null };
+  scope: Pick<Scope, 'getClient' | 'getCreateComponentStackAttachment'>;
 }
 
 export type ErrorBoundaryProps = JSX.LibraryManagedAttributes<
@@ -210,7 +199,7 @@ export class ErrorBoundary extends Component<
     onResetKeysChange: noop,
     onUnmount: noop,
     disablePost: false,
-    scope: { getClient: getBugSplat },
+    scope: appScope,
   };
 
   state = INITIAL_STATE;
@@ -257,9 +246,9 @@ export class ErrorBoundary extends Component<
     await beforePost(client, error, componentStack);
 
     return client.post(error, {
-      attachments: [
-        createComponentStackAttachment(componentStack),
-      ],
+      attachments: componentStack
+        ? [scope.getCreateComponentStackAttachment()(componentStack)]
+        : [],
     });
   }
 
