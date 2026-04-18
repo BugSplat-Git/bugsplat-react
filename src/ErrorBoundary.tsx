@@ -11,8 +11,8 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
-import { getBugSplat } from './appScope';
-import { defaultCreateComponentStackAttachment } from './scope';
+import { appScope } from './appScope';
+import type { Scope } from './scope';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -139,17 +139,7 @@ interface InternalErrorBoundaryProps {
    * to pass their own scope that will inject the client for use by
    * ErrorBoundary.
    */
-  scope: {
-    getClient(): BugSplat | null;
-    /**
-     * Optional — override how a componentStack string is packaged into an
-     * attachment. When absent (e.g. a user-supplied duck-typed scope that
-     * pre-dates this API), ErrorBoundary falls back to the default builder.
-     */
-    getCreateComponentStackAttachment?: () =>
-      | ((componentStack: string) => BugSplatAttachment)
-      | undefined;
-  };
+  scope: Pick<Scope, 'getClient' | 'getCreateComponentStackAttachment'>;
 }
 
 export type ErrorBoundaryProps = JSX.LibraryManagedAttributes<
@@ -209,7 +199,7 @@ export class ErrorBoundary extends Component<
     onResetKeysChange: noop,
     onUnmount: noop,
     disablePost: false,
-    scope: { getClient: getBugSplat },
+    scope: appScope,
   };
 
   state = INITIAL_STATE;
@@ -255,12 +245,9 @@ export class ErrorBoundary extends Component<
 
     await beforePost(client, error, componentStack);
 
-    const createAttachment = scope.getCreateComponentStackAttachment?.()
-      ?? defaultCreateComponentStackAttachment;
-
     return client.post(error, {
       attachments: componentStack
-        ? [createAttachment(componentStack)]
+        ? [scope.getCreateComponentStackAttachment()(componentStack)]
         : [],
     });
   }

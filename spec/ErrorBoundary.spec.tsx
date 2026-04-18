@@ -87,7 +87,7 @@ describe('<ErrorBoundary />', () => {
 
     describe('when BugSplat has been initialized', () => {
       let bugSplat: BugSplat;
-      let scope: Pick<Scope, 'getClient'>;
+      let scope: Scope;
 
       beforeEach(() => {
         bugSplat = {
@@ -96,7 +96,7 @@ describe('<ErrorBoundary />', () => {
           version: '',
           post: mockPost,
         } as unknown as BugSplat;
-        scope = { getClient: () => bugSplat };
+        scope = new Scope(bugSplat);
       });
 
       it('should call onError', async () => {
@@ -172,10 +172,7 @@ describe('<ErrorBoundary />', () => {
       it('honors scope.getCreateComponentStackAttachment() when provided', async () => {
         const customAttachment = { filename: 'componentStack.txt', data: 'CUSTOM' };
         const customBuilder = jest.fn(() => customAttachment);
-        const scopeWithBuilder = {
-          getClient: () => bugSplat,
-          getCreateComponentStackAttachment: () => customBuilder,
-        };
+        const scopeWithBuilder = new Scope(bugSplat, customBuilder);
 
         render(
           <ErrorBoundary scope={scopeWithBuilder} fallback={BasicFallback}>
