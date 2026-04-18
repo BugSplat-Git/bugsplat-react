@@ -21,9 +21,14 @@ export interface BugSplatInit {
 }
 
 /**
- * Container for managing shared `BugSplat` instance
+ * Container for managing shared `BugSplat` instance.
+ *
+ * Exported so platform-specific wrappers (`@bugsplat/expo`, etc.) can configure
+ * scope-level behavior — e.g. overriding how `ErrorBoundary` builds the
+ * component-stack attachment — without having to construct and thread their
+ * own `Scope` through `<ErrorBoundary scope={…}>`.
  */
-const appScope: Scope = new Scope();
+export const appScope: Scope = new Scope();
 
 /**
  * Initialize a new BugSplat instance and store the reference in scope

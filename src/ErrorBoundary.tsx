@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { getBugSplat } from './appScope';
+import { defaultCreateComponentStackAttachment } from './scope';
 
 /**
  * Shallowly compare two arrays to determine if they are different.
@@ -26,44 +27,6 @@ function isArrayDiff(a: unknown[] = [], b: unknown[] = []) {
   }
 
   return a.some((item, index) => !Object.is(item, b[index]));
-}
-
-const isReactNative =
-  typeof navigator !== 'undefined' &&
-  (navigator as { product?: string }).product === 'ReactNative';
-
-function utf8ToBase64(text: string): string {
-  const NodeBuffer = (globalThis as { Buffer?: { from(s: string, enc: string): { toString(enc: string): string } } }).Buffer;
-  if (NodeBuffer) {
-    return NodeBuffer.from(text, 'utf-8').toString('base64');
-  }
-  return btoa(unescape(encodeURIComponent(text)));
-}
-
-/**
- * Pack a component stack trace string into an attachment.
- *
- * On web we wrap the text in a `Blob` so FormData sends it as a real file
- * part. On React Native we can't use a `Blob` (RN's FormData polyfill can't
- * serialize browser Blobs), so we encode the text as a base64 `data:` URI
- * inside RN's native `{ uri, type }` file shape instead.
- */
-function createComponentStackAttachment(
-  componentStack: string
-): BugSplatAttachment {
-  if (isReactNative) {
-    return {
-      filename: 'componentStack.txt',
-      data: {
-        uri: `data:text/plain;base64,${utf8ToBase64(componentStack)}`,
-        type: 'text/plain',
-      },
-    };
-  }
-  return {
-    filename: 'componentStack.txt',
-    data: new Blob([componentStack], { type: 'text/plain' }),
-  };
 }
 
 export interface FallbackProps {
@@ -176,7 +139,17 @@ interface InternalErrorBoundaryProps {
    * to pass their own scope that will inject the client for use by
    * ErrorBoundary.
    */
-  scope: { getClient(): BugSplat | null };
+  scope: {
+    getClient(): BugSplat | null;
+    /**
+     * Optional — override how a componentStack string is packaged into an
+     * attachment. When absent (e.g. a user-supplied duck-typed scope that
+     * pre-dates this API), ErrorBoundary falls back to the default builder.
+     */
+    getCreateComponentStackAttachment?: () =>
+      | ((componentStack: string) => BugSplatAttachment)
+      | undefined;
+  };
 }
 
 export type ErrorBoundaryProps = JSX.LibraryManagedAttributes<
@@ -282,10 +255,13 @@ export class ErrorBoundary extends Component<
 
     await beforePost(client, error, componentStack);
 
+    const createAttachment = scope.getCreateComponentStackAttachment?.()
+      ?? defaultCreateComponentStackAttachment;
+
     return client.post(error, {
-      attachments: [
-        createComponentStackAttachment(componentStack),
-      ],
+      attachments: componentStack
+        ? [createAttachment(componentStack)]
+        : [],
     });
   }
 
