@@ -25,6 +25,19 @@ const ERRORS: Error[] = [
   RangeError('The argument must be between -500 and 500'),
 ];
 
+/**
+ * Fails the way real code fails: JSON.parse throws a SyntaxError, which is
+ * wrapped in a higher-level Error that keeps it as `cause`. BugSplat renders
+ * each link of the chain as a "Caused by:" row with its own stack.
+ */
+export function loadUserSettings() {
+  try {
+    JSON.parse('{ not valid json');
+  } catch (error) {
+    throw new Error('Failed to load user settings', { cause: error });
+  }
+}
+
 function ThrowOnError(props: { error: Error | null }) {
   useErrorHandler(props.error);
   return null;
@@ -68,6 +81,14 @@ function App() {
       description: data.description,
       attachments,
     });
+  }
+
+  function crashWithCause() {
+    try {
+      loadUserSettings();
+    } catch (error) {
+      setError(error as Error);
+    }
   }
 
   return (
@@ -119,6 +140,10 @@ function App() {
               <h4>{error.message}</h4>
             </button>
           ))}
+          <button className={styles.error} onClick={crashWithCause}>
+            <h2>Crash with cause</h2>
+            <h4>Failed to load user settings, caused by a SyntaxError from JSON.parse</h4>
+          </button>
         </div>
         <div className={styles.feedback}>
           <h2>Feedback</h2>
