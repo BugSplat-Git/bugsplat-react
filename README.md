@@ -43,6 +43,9 @@ sub-dependency, [bugsplat](https://github.com/BugSplat-Git/bugsplat-js).
 npm i @bugsplat/react --save
 ```
 
+@bugsplat/react supports React 18 and 19. TypeScript projects on React 18 need
+`@types/react` 18.2.6 or later.
+
 In addition to standard `package.json` properties `name` and `version`, include
 a `database` property to your `package.json` file with the value of your BugSplat
 database. Make sure to replace `{{YOUR_DATABASE_NAME}}` with your actual
